@@ -286,8 +286,9 @@ public abstract class ConnectionOrientedMessageChannel extends MessageChannel im
                     || sipMessage.getCallId() == null
                     || sipMessage.getCSeq() == null
                     || sipMessage.getViaHeaders() == null) {
-                String badmsg = sipMessage.encode();
+                
                 if (logger.isLoggingEnabled()) {
+                    String badmsg = sipMessage.encode();
                     logger.logError("bad message " + badmsg);
                     logger.logError(">>> Dropped Bad Msg");
                 }
@@ -298,6 +299,9 @@ public abstract class ConnectionOrientedMessageChannel extends MessageChannel im
             sipMessage.setRemotePort(this.getPeerPort());
             sipMessage.setLocalAddress(this.getMessageProcessor().getIpAddress());
             sipMessage.setLocalPort(this.getPort());
+            //Issue 3: https://telestax.atlassian.net/browse/JSIP-3
+            sipMessage.setPeerPacketSourceAddress(this.peerAddress);
+            sipMessage.setPeerPacketSourcePort(this.peerPort);
             
             ViaList viaList = sipMessage.getViaHeaders();
             // For a request
