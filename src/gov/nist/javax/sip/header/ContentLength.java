@@ -80,6 +80,9 @@ public class ContentLength
      * Comment for <code>serialVersionUID</code>
      */
     private static final long serialVersionUID = 1187190542411037027L;
+
+    public static final String NAME_LOWER = NAME.toLowerCase();
+
     /**
      * contentLength field.
      */
