@@ -87,7 +87,8 @@ public abstract class SIPTransactionStack implements
      * Connection linger time (seconds) this is the time (in seconds) for which
      * we linger the TCP connection before closing it.
      */
-    public static final int CONNECTION_LINGER_TIME = 8;
+    // Moved to non constant as part of https://github.com/Mobicents/jain-sip/issues/40
+    private static int connectionLingerTimer = 8;
 
     /*
      * Dialog Early state timeout duration.
@@ -346,9 +347,9 @@ public abstract class SIPTransactionStack implements
     protected boolean checkBranchId;
 
     protected boolean isAutomaticDialogErrorHandlingEnabled = true;
-    
+
     protected boolean isServerLoopDetectionEnabled = true;
-    
+
     protected boolean isDialogTerminatedEventDeliveredForNullDialog = false;
 
     protected boolean isTcpNoDelayEnabled = false;
@@ -473,7 +474,7 @@ public abstract class SIPTransactionStack implements
             // Check if we still have a timer (it may be null after shutdown)
             if (getTimer() != null) {
                 // Register the timer task if we haven't done so
-                if (threadHandle == null) {
+                if (threadHandle == null && getThreadAuditor() != null) {
                     // This happens only once since the thread handle is passed
                     // to the next scheduled ping timer
                     threadHandle = getThreadAuditor().addCurrentThread();
@@ -3365,5 +3366,34 @@ public abstract class SIPTransactionStack implements
 
 	public void setSslRenegotiationEnabled(boolean sslRenegotiationEnabled) {
 		this.sslRenegotiationEnabled = sslRenegotiationEnabled;
+	}
+
+	/**
+	 * @return the connectionLingerTimer
+	 */
+	public int getConnectionLingerTimer() {
+		return connectionLingerTimer;
+	}
+
+	/**
+	 * @param connectionLingerTimer the connectionLingerTimer to set
+	 */
+	public void setConnectionLingerTimer(int connectionLingerTimer) {
+		SIPTransactionStack.connectionLingerTimer = connectionLingerTimer;
+	}
+
+	/**
+	 * @return the stackCongestionControlTimeout
+	 */
+	public int getStackCongestionControlTimeout() {
+		return stackCongestionControlTimeout;
+	}
+
+	/**
+	 * @param stackCongestionControlTimeout the stackCongestionControlTimeout to set
+	 */
+	public void setStackCongestionControlTimeout(
+			int stackCongestionControlTimeout) {
+		this.stackCongestionControlTimeout = stackCongestionControlTimeout;
 	}
 }

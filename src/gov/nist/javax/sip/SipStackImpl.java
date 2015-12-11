@@ -687,7 +687,6 @@ public class SipStackImpl extends SIPTransactionStack implements
 			try {				
 				setTimer((SipTimer)Class.forName(defaultTimerName).newInstance());
 				getTimer().start(this, configurationProperties);
-				// Contribution for https://github.com/Mobicents/jain-sip/issues/39
 				if (getThreadAuditor() != null && getThreadAuditor().isEnabled()) {
 		            // Start monitoring the timer thread
 		            getTimer().schedule(new PingTimer(null), 0);
@@ -939,11 +938,11 @@ public class SipStackImpl extends SIPTransactionStack implements
 		if ( super.isAutomaticDialogSupportEnabled ) {
 			super.isAutomaticDialogErrorHandlingEnabled = true;
 		}
-		
+
 		super.isServerLoopDetectionEnabled = configurationProperties
       .getProperty("gov.nist.javax.sip.SERVER_LOOP_DETECTION","on")
       .equalsIgnoreCase("on");
-	
+
 		if (configurationProperties
 				.getProperty("gov.nist.javax.sip.MAX_LISTENER_RESPONSE_TIME") != null) {
 			super.maxListenerResponseTime = Integer
@@ -1372,6 +1371,9 @@ public class SipStackImpl extends SIPTransactionStack implements
 						.toString());
 		bufferSizeInteger = new Integer(bufferSize).intValue();
 		super.setSendUdpBufferSize(bufferSizeInteger);
+		// Contribution for https://github.com/Mobicents/jain-sip/issues/40
+		super.setConnectionLingerTimer(Integer.parseInt(configurationProperties.getProperty(
+				"gov.nist.javax.sip.LINGER_TIMER", "8")));
 
 		super.isBackToBackUserAgent = Boolean
 				.parseBoolean(configurationProperties.getProperty(
@@ -1429,7 +1431,6 @@ public class SipStackImpl extends SIPTransactionStack implements
 		try {
 			setTimer((SipTimer)Class.forName(defaultTimerName).newInstance());
 			getTimer().start(this, configurationProperties);
-			// Contribution for https://github.com/Mobicents/jain-sip/issues/39
 			if (getThreadAuditor() != null && getThreadAuditor().isEnabled()) {
 	            // Start monitoring the timer thread
 	            getTimer().schedule(new PingTimer(null), 0);
@@ -1552,9 +1553,9 @@ public class SipStackImpl extends SIPTransactionStack implements
 				lip = new ListeningPointImpl(this, port, transport);
 				lip.messageProcessor = messageProcessor;
 				messageProcessor.setListeningPoint(lip);
+				this.listeningPoints.put(key, lip);
 				// start processing messages.
 				messageProcessor.start();
-				this.listeningPoints.put(key, lip);
 				if(socketTimeoutAuditor == null && nioSocketMaxIdleTime > 0 && messageProcessor instanceof ConnectionOrientedMessageProcessor) {
 		        	// https://java.net/jira/browse/JSIP-471 use property from the stack instead of hard coded 20s
 					socketTimeoutAuditor = new SocketTimeoutAuditor(nioSocketMaxIdleTime);
@@ -1936,10 +1937,6 @@ public class SipStackImpl extends SIPTransactionStack implements
 	public boolean isAutomaticDialogErrorHandlingEnabled() {
 		return super.isAutomaticDialogErrorHandlingEnabled;
 	}
-	
-	public boolean isServerLoopDetectionEnabled() {
-    return super.isServerLoopDetectionEnabled;
-  }
 
 	
 	public void setTlsSecurityPolicy(TlsSecurityPolicy tlsSecurityPolicy) {
