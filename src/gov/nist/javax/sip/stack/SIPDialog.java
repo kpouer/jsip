@@ -36,6 +36,7 @@ import gov.nist.core.NameValueList;
 import gov.nist.core.StackLogger;
 import gov.nist.javax.sip.DialogExt;
 import gov.nist.javax.sip.ListeningPointImpl;
+import gov.nist.javax.sip.ReleaseReferencesStrategy;
 import gov.nist.javax.sip.SipListenerExt;
 import gov.nist.javax.sip.SipProviderImpl;
 import gov.nist.javax.sip.SipStackImpl;
@@ -318,13 +319,12 @@ public class SIPDialog implements javax.sip.Dialog, DialogExt {
                                                                  // requests.
 
     // aggressive flag to optimize eagerly
-    private boolean releaseReferences;
+    private ReleaseReferencesStrategy releaseReferencesStrategy;
 
     private transient EarlyStateTimerTask earlyStateTimerTask;
 
     private int earlyDialogTimeout = 180;
 
-	private int ackSemTakenFor;
 	private Set<String> responsesReceivedInForkingCase = new HashSet<String>(0);
 
   private SIPDialog originalDialog;
@@ -801,7 +801,7 @@ public class SIPDialog implements javax.sip.Dialog, DialogExt {
             logger.logStackTrace();
         }
         addEventListener(sipStack);
-        releaseReferences = sipStack.isAggressiveCleanup();
+        releaseReferencesStrategy = sipStack.getReleaseReferencesStrategy();
     }
 
     /**
@@ -842,7 +842,7 @@ public class SIPDialog implements javax.sip.Dialog, DialogExt {
         }
         this.isBackToBackUserAgent = sipStack.isBackToBackUserAgent;
         addEventListener(sipStack);
-        releaseReferences = sipStack.isAggressiveCleanup();
+        releaseReferencesStrategy = sipStack.getReleaseReferencesStrategy();
     }
     
     /**
@@ -4266,7 +4266,7 @@ public class SIPDialog implements javax.sip.Dialog, DialogExt {
     // or sending an ACK
     // to save on mem
     protected void cleanUpOnAck() {
-        if (isReleaseReferences()) {
+        if (getReleaseReferencesStrategy() != ReleaseReferencesStrategy.None) {
             if (logger.isLoggingEnabled(LogWriter.TRACE_DEBUG)) {
                 logger.logDebug(
                         "cleanupOnAck : " + getDialogId());
@@ -4319,7 +4319,7 @@ public class SIPDialog implements javax.sip.Dialog, DialogExt {
      * 
      */
     protected void cleanUp() {
-        if (isReleaseReferences()) {
+        if (getReleaseReferencesStrategy() != ReleaseReferencesStrategy.None) {
             cleanUpOnAck();
             if (logger.isLoggingEnabled(LogWriter.TRACE_DEBUG)) {
                 logger
@@ -4382,8 +4382,8 @@ public class SIPDialog implements javax.sip.Dialog, DialogExt {
      * 
      * @see gov.nist.javax.sip.DialogExt#isReleaseReferences()
      */
-    public boolean isReleaseReferences() {
-        return releaseReferences;
+    public ReleaseReferencesStrategy getReleaseReferencesStrategy() {
+        return releaseReferencesStrategy;
     }
 
     /*
@@ -4391,8 +4391,8 @@ public class SIPDialog implements javax.sip.Dialog, DialogExt {
      * 
      * @see gov.nist.javax.sip.DialogExt#setReleaseReferences(boolean)
      */
-    public void setReleaseReferences(boolean releaseReferences) {
-        this.releaseReferences = releaseReferences;
+    public void setReleaseReferencesStrategy(ReleaseReferencesStrategy releaseReferencesStrategy) {
+        this.releaseReferencesStrategy = releaseReferencesStrategy;
     }
 
     public void setEarlyDialogTimeoutSeconds(int seconds) {
