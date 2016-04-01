@@ -367,6 +367,8 @@ public abstract class SIPTransactionStack implements
 
     private boolean deliverTerminatedEventForAck = false;
 
+    protected boolean patchWebSocketHeaders = false;
+    
     protected ClientAuthType clientAuth = ClientAuthType.Default;
     
     // ThreadPool when parsed SIP messages are processed. Affects the case when many TCP calls use single socket.
@@ -3017,7 +3019,7 @@ public abstract class SIPTransactionStack implements
     public void setDeliverDialogTerminatedEventForNullDialog() {
         this.isDialogTerminatedEventDeliveredForNullDialog = true;
     }
-
+    
     public void addForkedClientTransaction(
             SIPClientTransaction clientTransaction) {
         String forkId = ((SIPRequest)clientTransaction.getRequest()).getForkId();
@@ -3072,6 +3074,14 @@ public abstract class SIPTransactionStack implements
        return this.minKeepAliveInterval;
     }
 
+    public void setPatchWebSocketHeaders(Boolean patchWebSocketHeaders) {
+    	this.patchWebSocketHeaders = patchWebSocketHeaders;
+    }
+
+    public boolean isPatchWebSocketHeaders() {
+        return patchWebSocketHeaders;
+    }
+    
     /**
      * @param maxForkTime
      *            the maxForkTime to set
