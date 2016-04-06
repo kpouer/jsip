@@ -28,6 +28,7 @@ package gov.nist.javax.sip.stack;
 import gov.nist.core.CommonLogger;
 import gov.nist.core.LogLevels;
 import gov.nist.core.LogWriter;
+import gov.nist.core.ServerLogger;
 import gov.nist.core.StackLogger;
 import gov.nist.javax.sip.SipStackImpl;
 import static gov.nist.javax.sip.SipStackImpl.DEFAULT_CIPHERS;
@@ -256,6 +257,8 @@ public class NioTlsWebSocketMessageChannel extends NioWebSocketMessageChannel im
 		// https://java.net/jira/browse/JSIP-497 fix transport for WSS
 		final byte[] msg = sipMessage.encodeAsBytes(this.getTransport());
 		sendMessage(msg, receiverAddress, receiverPort, this.client);
+
+        logMessage(sipMessage, receiverAddress, receiverPort, System.currentTimeMillis());
     }
 
 	public void sendHttpMessage(final byte message[], final InetAddress receiverAddress,
