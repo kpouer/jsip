@@ -229,7 +229,7 @@ public class SIPClientTransactionImpl extends SIPTransactionImpl implements SIPC
   private AtomicBoolean timerKStarted = new AtomicBoolean(false);
   private boolean transactionTimerCancelled = false;
   private Set<Integer> responsesReceived = new CopyOnWriteArraySet<Integer>();
-  
+
   private boolean terminateDialogOnCleanUp = true;
 
   public class TransactionTimer extends SIPStackTimerTask {
@@ -263,6 +263,16 @@ public class SIPClientTransactionImpl extends SIPTransactionImpl implements SIPC
 
     }
 
+        @Override
+        public Object getThreadHash() {
+            Request request = getRequest();
+            if (request != null && request instanceof SIPRequest) {
+                return ((SIPRequest)request).getCallIdHeader().getCallId();
+            } else {
+                return null;
+            }
+        }
+
   }
 
   class ExpiresTimerTask extends SIPStackTimerTask {
@@ -285,6 +295,16 @@ public class SIPClientTransactionImpl extends SIPTransactionImpl implements SIPC
         }
       }
     }
+
+        @Override
+        public Object getThreadHash() {
+            Request request = getRequest();
+            if (request != null && request instanceof SIPRequest) {
+                return ((SIPRequest)request).getCallIdHeader().getCallId();
+            } else {
+                return null;
+            }
+        }
 
   }
 
@@ -691,6 +711,16 @@ public class SIPClientTransactionImpl extends SIPTransactionImpl implements SIPC
               }
               fireTimeoutTimer();
               cleanUpOnTerminated();
+            }
+
+            @Override
+            public Object getThreadHash() {
+                Request request = getRequest();
+                if (request != null && request instanceof SIPRequest) {
+                    return ((SIPRequest)request).getCallIdHeader().getCallId();
+                } else {
+                    return null;
+                }
             }
           };
           if (time > 0) {
@@ -1926,9 +1956,9 @@ public class SIPClientTransactionImpl extends SIPTransactionImpl implements SIPC
       // SIPTransactionStack.CONNECTION_LINGER_TIME * 1000);
       // }
     }
-    
+
     if (terminateDialogOnCleanUp) {
-      // If dialog is null state, no response is received and we should clean it up now, 
+      // If dialog is null state, no response is received and we should clean it up now,
       // it's hopeless to recover. Refers to this issue https://github.com/usnistgov/jsip/issues/8
       if(this.defaultDialog != null && this.defaultDialog.getState() == null) {
       	this.defaultDialog.setState(SIPDialog.TERMINATED_STATE);
@@ -1998,5 +2028,5 @@ public class SIPClientTransactionImpl extends SIPTransactionImpl implements SIPC
   public void setTerminateDialogOnCleanUp(boolean enabled) {
     terminateDialogOnCleanUp = enabled;
   }
-  
+
 }

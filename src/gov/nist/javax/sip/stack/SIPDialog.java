@@ -394,6 +394,11 @@ public class SIPDialog implements javax.sip.Dialog, DialogExt {
             }
         }
 
+        @Override
+        public Object getThreadHash() {
+            return getCallId().getCallId();
+        }
+
     }
 
     /**
@@ -541,6 +546,11 @@ public class SIPDialog implements javax.sip.Dialog, DialogExt {
             }
         }
 
+        @Override
+        public Object getThreadHash() {
+            return getCallId().getCallId();
+        }
+
     }
 
     class DialogTimerTask extends SIPStackTimerTask implements Serializable {
@@ -635,6 +645,11 @@ public class SIPDialog implements javax.sip.Dialog, DialogExt {
             super.cleanUpBeforeCancel();
         }
 
+        @Override
+        public Object getThreadHash() {
+            return getCallId().getCallId();
+        }
+
     }
 
     /**
@@ -646,6 +661,11 @@ public class SIPDialog implements javax.sip.Dialog, DialogExt {
 
         public void runTask() {
             delete();
+        }
+
+        @Override
+        public Object getThreadHash() {
+            return getCallId().getCallId();
         }
 
     }
@@ -662,6 +682,11 @@ public class SIPDialog implements javax.sip.Dialog, DialogExt {
         public DialogDeleteIfNoAckSentTask(long seqno) {
             this.seqno = seqno;
         }
+        
+        @Override
+        public Object getThreadHash() {
+            return getCallId().getCallId();
+        }        
 
         public void runTask() {
             if (SIPDialog.this.highestSequenceNumberAcknowledged < seqno) {
