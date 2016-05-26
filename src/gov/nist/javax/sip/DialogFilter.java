@@ -1193,8 +1193,9 @@ class DialogFilter implements ServerRequestInterface, ServerResponseInterface {
                     if (subscriptionDialog != null
                             && subscriptionDialog.getDialogId() == null) {
                         subscriptionDialog.setDialogId(dialogId);
-
+                        logger.logDebug("Dialog id set on default dialog.");
                     } else {
+                        //try searching dialogId only if default dialog is null
                         subscriptionDialog = pendingSubscribeClientTx
                                 .getDialog(dialogId);
                     }

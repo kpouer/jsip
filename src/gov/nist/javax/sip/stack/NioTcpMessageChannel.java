@@ -499,6 +499,4 @@ public class NioTcpMessageChannel extends ConnectionOrientedMessageChannel {
             }
         }
     }
-    }
-
 }
