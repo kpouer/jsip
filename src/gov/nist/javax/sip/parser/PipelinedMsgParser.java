@@ -460,17 +460,14 @@ public final class PipelinedMsgParser implements Runnable {
                     if (stackLogger.isLoggingEnabled(StackLogger.TRACE_DEBUG)) {
                         stackLogger.logDebug("About to parse : " + inputBuffer.toString());
                     }
-                    byte[] inputBufferBytes = null;
+                    byte[] inputBufferBytes;
                     try {
-						inputBufferBytes = inputBuffer.toString().getBytes("UTF-8");
-					} catch (UnsupportedEncodingException e) {
-						// logging required ??
-					}
-                    if(inputBufferBytes != null) {
-                    	sipMessage = smp.parseSIPMessage(inputBufferBytes, false, false, sipMessageListener);
-                    } else {
-                    	sipMessage = smp.parseSIPMessage(inputBuffer.toString().getBytes(), false, false, sipMessageListener);
+                        inputBufferBytes = inputBuffer.toString().getBytes("UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        // log the lack of UTF8 support here?
+                        inputBufferBytes = inputBuffer.toString().getBytes();
                     }
+                    sipMessage = smp.parseSIPMessage(inputBufferBytes, false, false, sipMessageListener);
                     if (sipMessage == null) {
                         this.rawInputStream.stopTimer();
                         continue;
