@@ -633,7 +633,7 @@ public class UDPMessageChannel extends MessageChannel implements
             } else {
                 if (logger.isLoggingEnabled(LogWriter.TRACE_DEBUG)) {
                     this.logger.logDebug(
-                            "null sipServerResponse!");
+                            "null sipServerResponse as could not acquire semaphore or the valve dropped the message.");
                 }
             }
 
