@@ -482,7 +482,7 @@ public abstract class ConnectionOrientedMessageChannel extends MessageChannel im
                         }
                     }
                 } else {
-                	if(sipStack.sipMessageValve == null) { // Allow message valves to nullify messages without error
+                    if (sipStack.sipMessageValves.isEmpty()) { // Allow message valves to nullify messages without error
                 		SIPResponse response = sipRequest
                 				.createResponse(Response.SERVICE_UNAVAILABLE);
 
