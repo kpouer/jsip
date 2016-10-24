@@ -474,7 +474,10 @@ public final class PipelinedMsgParser implements Runnable {
                     }
                 } catch (ParseException ex) {
                     // Just ignore the parse exception.
-                    stackLogger.logError("Detected a parse error", ex);
+                    if (logger.isLoggingEnabled(StackLogger.TRACE_DEBUG)) {
+                        this.logger.logDebug(
+                                "Detected a parsing issue " + inputBuffer.toString() + " " + ex.getMessage());
+                    }
                     continue;
                 }
 
