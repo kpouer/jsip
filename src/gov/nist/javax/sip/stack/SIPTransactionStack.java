@@ -377,6 +377,8 @@ public abstract class SIPTransactionStack implements
     
     protected boolean patchRport = false;
     
+    protected boolean patchReceivedRport;
+    
     protected ClientAuthType clientAuth = ClientAuthType.Default;
     
     // ThreadPool when parsed SIP messages are processed. Affects the case when many TCP calls use single socket.
@@ -3097,6 +3099,14 @@ public abstract class SIPTransactionStack implements
 
     public boolean isPatchRport() {
         return patchRport;
+    }
+    
+    public void setPatchReceivedRport(boolean patchReceivedRport) {
+        this.patchReceivedRport = patchReceivedRport;
+    }
+
+    public boolean isPatchReceivedRport() {
+        return patchReceivedRport;
     }
     
     /**
