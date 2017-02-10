@@ -396,6 +396,8 @@ public abstract class SIPTransactionStack implements
     public MessageProcessorFactory messageProcessorFactory;
     
     public long nioSocketMaxIdleTime;
+    
+    public NIOMode nioMode = NIOMode.BLOCKING;
 
     private ReleaseReferencesStrategy releaseReferencesStrategy = ReleaseReferencesStrategy.None;
 
@@ -425,8 +427,6 @@ public abstract class SIPTransactionStack implements
     private long sslHandshakeTimeout = -1;
     
     private boolean sslRenegotiationEnabled = false;
-    
-    protected SocketTimeoutAuditor socketTimeoutAuditor = null;
 
     
     public ScheduledExecutorService getSelfRoutingThreadpoolExecutor() {

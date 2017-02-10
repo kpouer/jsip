@@ -38,7 +38,12 @@ import gov.nist.javax.sip.header.StatusLine;
 import gov.nist.javax.sip.header.To;
 import gov.nist.javax.sip.header.Via;
 import gov.nist.javax.sip.message.SIPMessage;
+import gov.nist.javax.sip.message.SIPRequest;
+import gov.nist.javax.sip.message.SIPResponse;
 import gov.nist.javax.sip.parser.NioPipelineParser;
+import gov.nist.javax.sip.stack.NioTcpMessageProcessor.PendingData;
+
+import static javax.sip.message.Response.SERVICE_UNAVAILABLE;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -46,45 +51,32 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.net.ssl.SSLException;
 
 public class NioTcpMessageChannel extends ConnectionOrientedMessageChannel {
 	private static StackLogger logger = CommonLogger
 			.getLogger(NioTcpMessageChannel.class);
-	protected static HashMap<SocketChannel, NioTcpMessageChannel> channelMap = new HashMap<SocketChannel, NioTcpMessageChannel>();
 
 	protected SocketChannel socketChannel;
 	protected long lastActivityTimeStamp;
 	NioPipelineParser nioParser = null;
 
-	public static NioTcpMessageChannel create(
-			NioTcpMessageProcessor nioTcpMessageProcessor,
-			SocketChannel socketChannel) throws IOException {
-		NioTcpMessageChannel retval = channelMap.get(socketChannel);
-		if (retval == null) {
-			retval = new NioTcpMessageChannel(nioTcpMessageProcessor,
-					socketChannel);
-			channelMap.put(socketChannel, retval);
-		}
-		retval.messageProcessor = nioTcpMessageProcessor;
-		retval.myClientInputStream = socketChannel.socket().getInputStream();
-		return retval;
-	}
+    Queue<PendingData> queue = new ConcurrentLinkedQueue<>();
 
-	public static NioTcpMessageChannel getMessageChannel(SocketChannel socketChannel) {
-		return channelMap.get(socketChannel);
-	}
+    synchronized void resetQueue() {
+        queue = new ConcurrentLinkedQueue<>();
+    }
 
-	public static void putMessageChannel(SocketChannel socketChannel,
-			NioTcpMessageChannel nioTcpMessageChannel) {
-		channelMap.put(socketChannel, nioTcpMessageChannel);
-	}
-	
-	public static void removeMessageChannel(SocketChannel socketChannel) {
-		channelMap.remove(socketChannel);
-	}
-	
+    void addPendingData(PendingData d) {
+        queue.add(d);
+    }
+
+
+
+
 	public void readChannel() {
         logger.logDebug("NioTcpMessageChannel::readChannel");
 		int bufferSize = 4096;
@@ -102,18 +94,18 @@ public class NioTcpMessageChannel extends ConnectionOrientedMessageChannel {
 			if (logger.isLoggingEnabled(LogWriter.TRACE_DEBUG)) {
 				logger.logDebug("Read " + nbytes + " from socketChannel");
 			}
-			
+
 			if(streamError) 
 				throw new IOException("End-of-stream read (-1). " +
 					"This is usually an indication we are stuck and it is better to disconnect.");
-			
+
 			// This prevents us from getting stuck in a selector thread spinloop when socket is constantly ready for reading but there are no bytes.
 			if(nbytes == 0) 
 				throw new IOException("The socket is giving us empty TCP packets. " +
 					"This is usually an indication we are stuck and it is better to disconnect.");
-			
+
 			// Otherwise just add the bytes to queue
-			
+
 			byte[] bytes = new byte[nbytes];
 			System.arraycopy(msg, 0, bytes, 0, nbytes);
 			addBytes(bytes);
@@ -199,7 +191,8 @@ public class NioTcpMessageChannel extends ConnectionOrientedMessageChannel {
 			peerProtocol = getTransport();
 			nioParser = new NioPipelineParser(sipStack, this,
 					this.sipStack.getMaxMessageSize());
-			putMessageChannel(socketChannel, this);
+            NIOHandler nioHandler = nioTcpMessageProcessor.nioHandler;
+            nioHandler.putMessageChannel(socketChannel, this);
 			lastActivityTimeStamp = System.currentTimeMillis();
 			super.key = MessageChannel.getKey(peerAddress, peerPort, getTransport());
 
@@ -226,7 +219,8 @@ public class NioTcpMessageChannel extends ConnectionOrientedMessageChannel {
 				logger.logDebug("Closing NioTcpMessageChannel "
 						+ this + " socketChannel = " + socketChannel);
 			}
-			removeMessageChannel(socketChannel);
+            NIOHandler nioHandler = ((NioTcpMessageProcessor) messageProcessor).nioHandler;
+            nioHandler.removeMessageChannel(socketChannel);
 			if(socketChannel != null) {
 				socketChannel.close();
 			}
@@ -360,7 +354,7 @@ public class NioTcpMessageChannel extends ConnectionOrientedMessageChannel {
 				close(false, false); // we can call socketChannel.close() directly but we better use the inherited method
 				
 				socketChannel = sock;
-				putMessageChannel(socketChannel, this);
+                nioHandler.putMessageChannel(socketChannel, this);
 				
 				onNewSocket(message);
 			}
@@ -474,5 +468,36 @@ public class NioTcpMessageChannel extends ConnectionOrientedMessageChannel {
 	public long getLastActivityTimestamp() {
 		return lastActivityTimeStamp;
 	}
+
+    public void triggerConnectFailure() {
+        //alert of IOException to pending Data TXs
+        Queue<PendingData> failedMsgs = queue;
+        resetQueue();
+        while (failedMsgs != null && failedMsgs.peek() != null ) {
+            PendingData pData = failedMsgs.poll();
+
+            SIPTransaction transaction = sipStack.findTransaction(pData.txId, false);
+            if (transaction != null) {
+                if (transaction instanceof SIPClientTransaction) {
+                    //8.1.3.1 Transaction Layer Errors
+                    if (transaction.getRequest() != null &&
+                            !transaction.getRequest().getMethod().equalsIgnoreCase("ACK"))
+                    {
+                        SIPRequest req = (SIPRequest) transaction.getRequest();
+                        SIPResponse unavRes = req.createResponse(SERVICE_UNAVAILABLE, "Transport error sending request.");
+                        try {
+                            this.processMessage(unavRes);
+                        } catch (Exception e) {
+                            logger.logError("failed to report transport error");
+                        }
+                    }
+                } else {
+                    //17.2.4 Handling Transport Errors
+                    transaction.raiseIOExceptionEvent();
+                }
+            }
+        }
+        resetQueue();
+    }
 
 }
