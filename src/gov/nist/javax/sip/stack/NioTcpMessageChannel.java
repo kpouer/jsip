@@ -497,7 +497,7 @@ public class NioTcpMessageChannel extends ConnectionOrientedMessageChannel {
                 }
             }
         }
-        resetQueue();
+    }
     }
 
 }
