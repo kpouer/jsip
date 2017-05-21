@@ -59,6 +59,9 @@ public class NioTcpMessageProcessor extends ConnectionOrientedMessageProcessor {
     // Cache the change request here, the selector thread will read it when it wakes up and execute the request
     protected final Queue<ChangeRequest> changeRequests = new ConcurrentLinkedQueue<>();
 
+    // Data send over a socket is cached here before hand, the selector thread will take it later for physical send
+    private final Map<SocketChannel, Queue<PendingData>> pendingData = Collections.synchronizedMap(new WeakHashMap<SocketChannel, Queue<PendingData>>());
+
     public static class PendingData {
         final String txId;
         final ByteBuffer buffer;
@@ -124,6 +127,9 @@ public class NioTcpMessageProcessor extends ConnectionOrientedMessageProcessor {
             // https://java.net/jira/browse/JSIP-501 bind to the right local address
             socketChannel.socket().bind(new InetSocketAddress(myAddress, 0));
         }
+        if(logger.isLoggingEnabled(LogWriter.TRACE_DEBUG)) {
+            logger.logDebug("Init connect " + address);
+        }
         socketChannel.connect(address);
         changeRequests.add(new ChangeRequest(socketChannel, ChangeRequest.REGISTER, SelectionKey.OP_CONNECT));
         //we don't wake the selector, wait for corresponding "send" operation to initiate the handshake
@@ -142,22 +148,36 @@ public class NioTcpMessageProcessor extends ConnectionOrientedMessageProcessor {
     	if(logger.isLoggingEnabled(LogWriter.TRACE_DEBUG))
     		logger.logDebug("Sending data " + data.length + " bytes on socket " + socket);
     	
-        NioTcpMessageChannel channel = nioHandler.getMessageChannel(socket);
-        if (channel!= null) {
-            Queue<PendingData> queue = channel.queue;
-            PendingData pData = new PendingData(MessageChannel.messageTxId.get() ,ByteBuffer.wrap(data));
-            queue.add(pData);
-
-            if (socket.isConnected()) {
-                this.changeRequests.add(new ChangeRequest(socket, ChangeRequest.CHANGEOPS, SelectionKey.OP_WRITE));
-            }//if not the selector will change to WRITe mode after connect
-
-            if(logger.isLoggingEnabled(LogWriter.TRACE_DEBUG))
-                logger.logDebug("Waking up selector thread");
-            this.selector.wakeup();
-        } else {
-            throw new IOException("No channel when sending.");
+        Queue<PendingData> queue = this.pendingData.get(socket);
+        //this condition optimizes in case the socket has an already existing
+        //queue. Contention will be avoided
+        if (queue == null) {
+            //Use the socket itself as monitor object, the map itself is already
+            //concurrent coll
+            synchronized (socket) {
+                //this condition is necessary to ensure consistency
+                if (!pendingData.containsKey(socket)) {
+                    queue = new ConcurrentLinkedQueue<>();
+                    this.pendingData.put(socket, queue);
+                } else {
+                    queue = this.pendingData.get(socket);
+                }
+            }
         }
+
+        PendingData pData = new PendingData(MessageChannel.messageTxId.get() ,ByteBuffer.wrap(data));
+        queue.add(pData);
+
+        if (socket.isConnected()) {
+            if(logger.isLoggingEnabled(LogWriter.TRACE_DEBUG)) {
+                logger.logDebug("Connected. lets set WRITE ops.");        
+            }
+            this.changeRequests.add(new ChangeRequest(socket, ChangeRequest.CHANGEOPS, SelectionKey.OP_WRITE));
+        }//if not the selector will change to WRITe mode after connect
+
+        if(logger.isLoggingEnabled(LogWriter.TRACE_DEBUG))
+            logger.logDebug("Waking up selector thread");
+        this.selector.wakeup();
     }
     
     // This will be our selector thread, only one thread for all sockets. If you want to understand the overall design decisions read this first http://rox-xmlrpc.sourceforge.net/niotut/
@@ -176,6 +196,8 @@ public class NioTcpMessageProcessor extends ConnectionOrientedMessageProcessor {
             	if(logger.isLoggingEnabled(LogWriter.TRACE_DEBUG))
             		logger.logDebug("Dead socketChannel" + socketChannel + " socket " + socketChannel.socket().getInetAddress() + ":"+socketChannel.socket().getPort());
             	selectionKey.cancel();
+                // https://java.net/jira/browse/JSIP-475 remove the socket from the hashmap
+                pendingData.remove(socketChannel);
             	return;
             }
             
@@ -186,21 +208,25 @@ public class NioTcpMessageProcessor extends ConnectionOrientedMessageProcessor {
         public void write(SelectionKey selectionKey) {
           	SocketChannel socketChannel = (SocketChannel) selectionKey.channel();
 
-            final NioTcpMessageChannel nioTcpMessageChannel = nioHandler.getMessageChannel(socketChannel);
+          	final NioTcpMessageChannel nioTcpMessageChannel = nioHandler.getMessageChannel(socketChannel);
             if(logger.isLoggingEnabled(LogWriter.TRACE_DEBUG))
             	logger.logDebug("Need to write something on nioTcpMessageChannel " + nioTcpMessageChannel + " socket " + socketChannel);
             if(nioTcpMessageChannel == null) {
             	if(logger.isLoggingEnabled(LogWriter.TRACE_DEBUG))
             		logger.logDebug("Dead socketChannel" + socketChannel + " socket " + socketChannel.socket().getInetAddress() + ":"+socketChannel.socket().getPort());
+                // https://java.net/jira/browse/JSIP-475 remove the socket from the hashmap
+                pendingData.remove(socketChannel);
             	selectionKey.cancel();
             	return;
             }
 
-            Queue<PendingData> queue = nioTcpMessageChannel.queue;
+            Queue<PendingData> queue = pendingData.get(socketChannel);
             if (queue == null || queue.isEmpty()) {
                 if(logger.isLoggingEnabled(LogWriter.TRACE_DEBUG)) {
                     logger.logDebug("The queue was empty on write.");
+                    logger.logDebug("We wrote away all data. Setting READ interest. Queue is emtpy now size =" + queue.size());
                 }
+                selectionKey.interestOps(SelectionKey.OP_READ);
                 return;
             }
             if(logger.isLoggingEnabled(LogWriter.TRACE_DEBUG))
@@ -223,6 +249,7 @@ public class NioTcpMessageProcessor extends ConnectionOrientedMessageProcessor {
                                     // Shall we perform a retry mechanism in case the remote host connection was closed due to a TCP RST ?
                                     // https://java.net/jira/browse/JSIP-475 in the meanwhile remove the data from the hashmap
                                     queue.remove();
+                                    pendingData.remove(socketChannel);                                    
                                     return;
                             }
 
@@ -252,7 +279,7 @@ public class NioTcpMessageProcessor extends ConnectionOrientedMessageProcessor {
         }
         
         public void connect(SelectionKey selectionKey) throws IOException {
-            SocketChannel socketChannel = (SocketChannel) selectionKey.channel();
+            final SocketChannel socketChannel = (SocketChannel) selectionKey.channel();
             final NioTcpMessageChannel nioTcpMessageChannel = nioHandler.getMessageChannel(socketChannel);
             if(logger.isLoggingEnabled(LogWriter.TRACE_DEBUG))
                 logger.logDebug("Got something on nioTcpMessageChannel " + nioTcpMessageChannel + " socket " + socketChannel);
@@ -264,19 +291,38 @@ public class NioTcpMessageProcessor extends ConnectionOrientedMessageProcessor {
             }
         	try {
         		socketChannel.finishConnect();
+                logger.logDebug("Connected Succesfully");
+                if(sipStack.getSelfRoutingThreadpoolExecutor() != null) {
+                    sipStack.getSelfRoutingThreadpoolExecutor().execute(new Runnable() {
+                        public void run() {
+                            nioTcpMessageChannel.triggerConnectSuccess();
+                        }
+                    });
+                } else {
+                    nioTcpMessageChannel.triggerConnectSuccess();
+                }
+                if (pendingData.get(socketChannel) != null &&
+                        !pendingData.get(socketChannel).isEmpty()) {
+                    logger.logDebug("Pending Data Available, setting WRITE opts.");
+                    selectionKey.interestOps(SelectionKey.OP_WRITE);
+                }
         	} catch (Exception e) {
                 if(logger.isLoggingEnabled(LogWriter.TRACE_DEBUG)) {
                         logger.logError("Cant connect", e);
                 }
                 selectionKey.cancel();
-                nioTcpMessageChannel.triggerConnectFailure();
-                //this may potentially block the selector thread!!!
-                nioTcpMessageChannel.close();
+                if(sipStack.getSelfRoutingThreadpoolExecutor() != null) {
+                    sipStack.getSelfRoutingThreadpoolExecutor().execute(new Runnable() {
+                        public void run() {
+                            nioTcpMessageChannel.triggerConnectFailure(pendingData.get(socketChannel));
+                        }
+                    });
+                } else {
+                    nioTcpMessageChannel.triggerConnectFailure(pendingData.get(socketChannel));
+                }
                 return;
             }
-            if (nioTcpMessageChannel.queue != null && !nioTcpMessageChannel.queue.isEmpty()) {
-                selectionKey.interestOps(SelectionKey.OP_WRITE);
-            }
+
         }
         
         public void accept(SelectionKey selectionKey) throws IOException{
@@ -303,6 +349,7 @@ public class NioTcpMessageProcessor extends ConnectionOrientedMessageProcessor {
         }
         @Override
         public void run() {
+            int selResult = 0;
         	while (true) {
         		if(logger.isLoggingEnabled(LogWriter.TRACE_TRACE)) {
         			logger.logTrace("Selector thread cycle begin...");
@@ -353,9 +400,9 @@ public class NioTcpMessageProcessor extends ConnectionOrientedMessageProcessor {
                         }
                         return;
                     } else {
-                        selector.select();
+                        selResult = selector.select();
                         if (logger.isLoggingEnabled(LogWriter.TRACE_TRACE)) {
-                            logger.logTrace("After select");
+                            logger.logTrace("After select:" + selResult + ".CRs:"+ changeRequests.size());
                         }
                     }
         		} catch (IOException e) {
@@ -367,7 +414,7 @@ public class NioTcpMessageProcessor extends ConnectionOrientedMessageProcessor {
         			}
         		}
                 try {
-                    if (selector.selectedKeys() == null) {
+                    if (selResult <= 0) {
                         if (logger.isLoggingEnabled(LogWriter.TRACE_DEBUG)) {
                             logger.logDebug("null selectedKeys ");
                         }
@@ -476,7 +523,9 @@ public class NioTcpMessageProcessor extends ConnectionOrientedMessageProcessor {
                         logger.logDebug("key " + key);
                         logger.logDebug("Creating " + retval);
                 }
-                selector.wakeup();
+                if (this.sipStack.nioMode.equals(NIOMode.BLOCKING)) {
+                    selector.wakeup();
+                }
         }  		
         return retval;      
     }     
@@ -521,7 +570,7 @@ public class NioTcpMessageProcessor extends ConnectionOrientedMessageProcessor {
     	if (logger.isLoggingEnabled(LogWriter.TRACE_DEBUG)) {
             logger.logDebug(Thread.currentThread() + " removing " + ((NioTcpMessageChannel)messageChannel).getSocketChannel() + " from processor " + getIpAddress()+ ":" + getPort() + "/" + getTransport());
         }
-        ((NioTcpMessageChannel)messageChannel).resetQueue();
+        pendingData.remove(((NioTcpMessageChannel)messageChannel).getSocketChannel());
     	super.remove(messageChannel);
     }
     

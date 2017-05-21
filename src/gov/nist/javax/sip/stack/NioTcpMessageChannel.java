@@ -26,7 +26,6 @@
 package gov.nist.javax.sip.stack;
 
 import gov.nist.core.CommonLogger;
-import gov.nist.core.InternalErrorHandler;
 import gov.nist.core.LogWriter;
 import gov.nist.core.StackLogger;
 import gov.nist.javax.sip.header.CSeq;
@@ -50,9 +49,7 @@ import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.text.ParseException;
-import java.util.HashMap;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.net.ssl.SSLException;
 
@@ -64,18 +61,8 @@ public class NioTcpMessageChannel extends ConnectionOrientedMessageChannel {
 	protected long lastActivityTimeStamp;
 	NioPipelineParser nioParser = null;
 
-    Queue<PendingData> queue = new ConcurrentLinkedQueue<>();
-
-    synchronized void resetQueue() {
-        queue = new ConcurrentLinkedQueue<>();
-    }
-
-    void addPendingData(PendingData d) {
-        queue.add(d);
-    }
-
-
-
+        private static final int BUF_SIZE = 4096;
+        private final ByteBuffer byteBuffer  = ByteBuffer.allocateDirect(BUF_SIZE);
 
 	public void readChannel() {
         logger.logDebug("NioTcpMessageChannel::readChannel");
@@ -470,10 +457,14 @@ public class NioTcpMessageChannel extends ConnectionOrientedMessageChannel {
 		return lastActivityTimeStamp;
 	}
 
-    public void triggerConnectFailure() {
+    public void triggerConnectSuccess() {
+        if (logger.isLoggingEnabled(LogWriter.TRACE_DEBUG)) {
+            logger.logDebug("Connection Success. Nothing else to do.");
+        }
+    }
+
+    public synchronized void triggerConnectFailure(Queue<PendingData> failedMsgs) {
         //alert of IOException to pending Data TXs
-        Queue<PendingData> failedMsgs = queue;
-        resetQueue();
         while (failedMsgs != null && failedMsgs.peek() != null ) {
             PendingData pData = failedMsgs.poll();
 
@@ -498,5 +489,6 @@ public class NioTcpMessageChannel extends ConnectionOrientedMessageChannel {
                 }
             }
         }
+        close();
     }
 }

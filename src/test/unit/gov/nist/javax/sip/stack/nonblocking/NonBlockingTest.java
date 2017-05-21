@@ -1,14 +1,12 @@
 package test.unit.gov.nist.javax.sip.stack.nonblocking;
 
+import gov.nist.core.CommonLogger;
 import gov.nist.javax.sip.ListeningPointImpl;
+import gov.nist.javax.sip.header.CSeq;
 import gov.nist.javax.sip.message.SIPRequest;
 import gov.nist.javax.sip.stack.NioMessageProcessorFactory;
-import gov.nist.javax.sip.stack.NioTcpMessageChannel;
-import gov.nist.javax.sip.stack.NonBlockingMessageProcessorFactory;
 import java.io.Closeable;
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,9 +19,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-
-import javax.net.ssl.SSLServerSocket;
-import javax.net.ssl.SSLServerSocketFactory;
 import javax.sip.ClientTransaction;
 import javax.sip.DialogTerminatedEvent;
 import javax.sip.IOExceptionEvent;
@@ -76,9 +71,9 @@ public class NonBlockingTest extends ScenarioHarness {
 
     private static final String TEST_PROTOCOL = "tcp";
     
-    private static final int NUM_THREADS = 10;
+    private static final int NUM_THREADS = 30;
     
-    private static final int THREAD_ASSERT_TIME = 3000;    
+    private static final int THREAD_ASSERT_TIME = 6000;    
     
 
     public void setUp() throws Exception {
@@ -133,9 +128,11 @@ public class NonBlockingTest extends ScenarioHarness {
 
     public void testConnReestablished() throws Exception {
         final Client client = new Client();
-        Server server = new Server();
         ExecutorService pool = Executors.newFixedThreadPool(NUM_THREADS);
-        testResources.add(new PoolCloser(pool));        
+        testResources.add(new PoolCloser(pool));     
+        Set<Closeable> servers = new HashSet();
+        Server server = new Server(SERVER_PORT);
+        servers.add(server);
         for (int i = 0; i < NUM_THREADS; i++) {
             pool.submit(new Runnable() {
                 public void run() {
@@ -149,12 +146,22 @@ public class NonBlockingTest extends ScenarioHarness {
         }
         pool.awaitTermination(THREAD_ASSERT_TIME, TimeUnit.MILLISECONDS);
         Thread.sleep(THREAD_ASSERT_TIME);        
-        //expect 2 channels, one for client and one for server
-        Assert.assertEquals(2, NioTcpMessageChannel.getCurrentChannelSize());
-        Assert.assertEquals(NUM_THREADS, server.requestCounter.get());
-        server.close();
+        //*2 counting for ACK
+        Assert.assertEquals(NUM_THREADS * 2, server.requestCounter.get());
+        for (Closeable rAux : servers) {
+            try {
+                rAux.close();
+            } catch (Exception e) {
+
+            }
+        }
+        SipFactory.getInstance().resetFactory();
+        CommonLogger.getLogger(NonBlockingTest.class).logInfo("server closed");       
         Thread.sleep(THREAD_ASSERT_TIME);
-        server = new Server();
+        client.resetCounters();
+        CommonLogger.getLogger(NonBlockingTest.class).logInfo("server restarted");
+        server = new Server(SERVER_PORT);
+        testResources.add(server);
         for (int i = 0; i < NUM_THREADS; i++) {
             pool.submit(new Runnable() {
                 public void run() {
@@ -167,7 +174,7 @@ public class NonBlockingTest extends ScenarioHarness {
             });
         }
         Thread.sleep(THREAD_ASSERT_TIME);
-        Assert.assertEquals(NUM_THREADS, server.requestCounter.get());
+        Assert.assertEquals(NUM_THREADS, client.responses.size()); 
     }    
 
     public class Server extends SipAdapter implements Closeable {
@@ -183,20 +190,19 @@ public class NonBlockingTest extends ScenarioHarness {
         
         private String host;
 
-        public Server() {
+        public Server(int port) {
             try {
-                testResources.add(this);
                 final Properties defaultProperties = new Properties();
                 host = "127.0.0.1";
 
-                defaultProperties.setProperty("javax.sip.STACK_NAME", "server");
-                defaultProperties.setProperty("gov.nist.javax.sip.TRACE_LEVEL", "DEBUG");
+                defaultProperties.setProperty("javax.sip.STACK_NAME", "server" + port);
+                defaultProperties.setProperty("gov.nist.javax.sip.TRACE_LEVEL", "TRACE");
                 defaultProperties.setProperty("gov.nist.javax.sip.DEBUG_LOG", "server_debug_ViaRPortTest.txt");
                 defaultProperties.setProperty("gov.nist.javax.sip.SERVER_LOG", "server_log_ViaRPortTest.txt");
                 defaultProperties.setProperty("gov.nist.javax.sip.READ_TIMEOUT", "1000");
                 defaultProperties.setProperty("gov.nist.javax.sip.CACHE_SERVER_CONNECTIONS",
                         "false");
-                defaultProperties.setProperty("gov.nist.javax.sip.MESSAGE_PROCESSOR_FACTORY", NonBlockingMessageProcessorFactory.class.getName());
+                defaultProperties.setProperty("gov.nist.javax.sip.MESSAGE_PROCESSOR_FACTORY", NioMessageProcessorFactory.class.getName());
                 this.sipFactory = SipFactory.getInstance();
                 this.sipFactory.setPathName("gov.nist");
                 messageFactory = sipFactory.createMessageFactory();
@@ -204,7 +210,7 @@ public class NonBlockingTest extends ScenarioHarness {
                 addressFactory = sipFactory.createAddressFactory();
                 this.sipStack = this.sipFactory.createSipStack(defaultProperties);
                 this.sipStack.start();
-                ListeningPoint lp = this.sipStack.createListeningPoint(host, SERVER_PORT, TEST_PROTOCOL);
+                ListeningPoint lp = this.sipStack.createListeningPoint(host, port, TEST_PROTOCOL);
                 this.provider = this.sipStack.createSipProvider(lp);
                 this.provider.addSipListener(this);
             } catch (Exception e) {
@@ -218,16 +224,18 @@ public class NonBlockingTest extends ScenarioHarness {
             super.processRequest(arg0);
             try {
             	SIPRequest req = (SIPRequest)arg0.getRequest();
-				ServerTransaction st = arg0.getServerTransaction();
-	            if (st == null) {
-	            	SipProvider sipProvider = (SipProvider) arg0.getSource();
-	                st = sipProvider.getNewServerTransaction(req);
-	            }
-	            Address address = addressFactory.createAddress("Shootme <sip:127.0.0.1:" + SERVER_PORT + ">");
-	            ContactHeader contactHeader = headerFactory.createContactHeader(address);
-	            Response res = messageFactory.createResponse(200, req);
-	            res.addHeader(contactHeader);
-	            st.sendResponse(res);
+                if ("INVITE".equals(req.getRequestLine().getMethod())) {
+                    ServerTransaction st = arg0.getServerTransaction();
+                    if (st == null) {
+                        SipProvider sipProvider = (SipProvider) arg0.getSource();
+                        st = sipProvider.getNewServerTransaction(req);
+                    }
+                    Address address = addressFactory.createAddress("Shootme <sip:127.0.0.1:" + SERVER_PORT + ">");
+                    ContactHeader contactHeader = headerFactory.createContactHeader(address);
+                    Response res = messageFactory.createResponse(200, req);
+                    res.addHeader(contactHeader);
+                    st.sendResponse(res);
+                }
 			} catch (Exception e) {
 			}
             
@@ -257,7 +265,7 @@ public class NonBlockingTest extends ScenarioHarness {
                 final Properties defaultProperties = new Properties();
                 host = "127.0.0.1";
                 defaultProperties.setProperty("javax.sip.STACK_NAME", "client");
-                defaultProperties.setProperty("gov.nist.javax.sip.TRACE_LEVEL", "DEBUG");
+                defaultProperties.setProperty("gov.nist.javax.sip.TRACE_LEVEL", "TRACE");
                 defaultProperties.setProperty("gov.nist.javax.sip.DEBUG_LOG", "client_debug.txt");
                 defaultProperties.setProperty("gov.nist.javax.sip.SERVER_LOG", "client_log.txt");
                 defaultProperties.setProperty("gov.nist.javax.sip.READ_TIMEOUT", "1000");
@@ -311,6 +319,23 @@ public class NonBlockingTest extends ScenarioHarness {
         public void close() throws IOException {
             this.sipStack.stop();
         }
+        
+        public void processResponse(ResponseEvent arg0) {
+            super.processResponse(arg0);
+            if (arg0.getResponse().getStatusCode() == 200
+                    && arg0.getClientTransaction() != null
+                    && arg0.getClientTransaction().getDialog() != null) {
+                Request ackRequest;
+                try {
+                    CSeq seq = (CSeq) arg0.getResponse().getHeader("CSeq");
+                    ackRequest = arg0.getClientTransaction().getDialog().createAck(seq.getSeqNumber());
+                    arg0.getClientTransaction().getDialog().sendAck(ackRequest);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }
     }
 
     private static class SipAdapter implements SipListener {
@@ -322,6 +347,14 @@ public class NonBlockingTest extends ScenarioHarness {
         AtomicInteger timeoutcounter = new AtomicInteger(0);
         AtomicInteger txTerminatedCounter = new AtomicInteger(0);
 
+        public void resetCounters(){
+            diagTerminatedCounter.set(0);
+            IOExceptionCounter.set(0);
+            requestCounter.set(0);
+            responses = Collections.synchronizedList(new ArrayList<ResponseEvent>());
+            timeoutcounter.set(0);
+            txTerminatedCounter.set(0);
+        }
         public void processDialogTerminated(DialogTerminatedEvent arg0) {
             diagTerminatedCounter.incrementAndGet();
         }
