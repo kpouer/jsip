@@ -1632,13 +1632,12 @@ public abstract class SIPMessage extends MessageObject implements javax.sip.mess
      */
 
     public void addHeader(String sipHeader) {
-        String hdrString = sipHeader.trim() + "\n";
         try {
-            HeaderParser parser = ParserFactory.createParser(sipHeader);
+            HeaderParser parser = ParserFactory.createParser(sipHeader + "\n");
             SIPHeader sh = parser.parse();
             this.attachHeader(sh, false);
         } catch (ParseException ex) {
-            this.getUnrecognizedHeadersList().add(hdrString);
+            this.getUnrecognizedHeadersList().add(sipHeader);
         }
     }
 
