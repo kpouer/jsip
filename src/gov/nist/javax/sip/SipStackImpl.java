@@ -97,15 +97,15 @@ import javax.sip.message.Request;
  * The JAIN-SIP stack is initialized by a set of properties (see the JAIN SIP
  * documentation for an explanation of these properties
  * {@link javax.sip.SipStack} ).
- * 
+ *
  * For NIST SIP stack all properties can also be passed as JVM system properties
  * from the command line as -D arguments.
- * 
+ *
  *  In addition to these, the following are
  * meaningful properties for the NIST SIP stack (specify these in the property
  * array when you create the JAIN-SIP statck):
  * <ul>
- * 
+ *
  * <li><b>gov.nist.javax.sip.TRACE_LEVEL = integer </b><br/>
  * <b> Use of this property is still supported but deprecated. Please use
  * gov.nist.javax.sip.STACK_LOGGER and gov.nist.javax.sip.SERVER_LOGGER for
@@ -128,7 +128,7 @@ import javax.sip.message.Request;
  * properties.setProperty("gov.nist.javax.sip.LOG4J_LOGGER_NAME", "SIPStackLogger");
  * </code> allows you to now control logging in the stack entirely using log4j
  * facilities.</li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.LOG_FACTORY = classpath </b> <b> Use of this
  * property is still supported but deprecated. Please use
  * gov.nist.javax.sip.STACK_LOGGER and gov.nist.javax.sip.SERVER_LOGGER for
@@ -139,7 +139,7 @@ import javax.sip.message.Request;
  * messages that are received or sent. This function allows you to log auxiliary
  * information related to the application or environmental conditions into the
  * log stream. The log factory must have a default constructor.</li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.SERVER_LOG = fileName </b><br/>
  * <b> Use of this property is still supported but deprecated. Please use
  * gov.nist.javax.sip.STACK_LOGGER and gov.nist.javax.sip.SERVER_LOGGER for
@@ -149,22 +149,22 @@ import javax.sip.message.Request;
  * Otherwise messages are logged in a format that can later be viewed using the
  * trace viewer application which is located in the tools/tracesviewer
  * directory. <font color=red> Mail this to us with bug reports. </font></li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.DEBUG_LOG = fileName </b> <b> Use of this property
  * is still supported but deprecated. Please use gov.nist.javax.sip.STACK_LOGGER
  * and gov.nist.javax.sip.SERVER_LOGGER for integration with logging frameworks
  * and for custom formatting of log records. </b> <br/>
  * Where the debug log goes. <font color=red> Mail this to us with bug reports.
  * </font></li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.LOG_MESSAGE_CONTENT = true|false </b><br/>
  * Set true if you want to capture content into the log. Default is false. A bad
  * idea to log content if you are using SIP to push a lot of bytes through TCP.</li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.LOG_STACK_TRACE_ON_MESSAGE_SEND = true|false </b><br/>
  * Set true if you want to to log a stack trace at INFO level for each message
  * send. This is really handy for debugging.</li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.STACK_LOGGER = full path name to the class
  * implementing gov.nist.core.StackLogger interface</b><br/>
  * If this property is defined the sip stack will try to instantiate it through
@@ -172,7 +172,7 @@ import javax.sip.message.Request;
  * than the ones provided by default to log what happens within the stack while
  * processing SIP messages. If this property is not defined, the default sip
  * stack LogWriter will be used for logging</li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.SERVER_LOGGER = full path name to the class
  * implementing gov.nist.core.ServerLogger interface</b><br/>
  * If this property is defined the sip stack will try to instantiate it through
@@ -180,24 +180,24 @@ import javax.sip.message.Request;
  * than the ones provided by default to log sent/received messages by the sip
  * stack. If this property is not defined, the default sip stack ServerLog will
  * be used for logging</li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.AUTOMATIC_DIALOG_ERROR_HANDLING = [true|false] </b>
  * <br/>
  * Default is <it>true</it>. This is also settable on a per-provider basis. This
  * flag is set to true by default. When set
  * to <it>false</it> the following behaviors are enabled:
  * <ul>
- * 
+ *
  * <li>Turn off Merged requests Loop Detection:<br/>
- *  The following behavior is turned off: If the request has no tag in the To header field, 
+ *  The following behavior is turned off: If the request has no tag in the To header field,
  *  the UAS core MUST check the request against ongoing transactions. If the From tag, Call-ID, and CSeq
  * exactly match those associated with an ongoing transaction, but the request
  * does not match that transaction (based on the matching rules in Section
  * 17.2.3), the UAS core SHOULD generate a 482 (Loop Detected) response and pass
  * it to the server transaction.
- * 
+ *
  * </ul>
- * 
+ *
  * <li><b>gov.nist.javax.sip.IS_BACK_TO_BACK_USER_AGENT = [true|false] </b> <br/>
  * Default is <it>false</it> This property controls a setting on the Dialog
  * objects that the stack manages. Pure B2BUA applications should set this flag
@@ -214,15 +214,15 @@ import javax.sip.message.Request;
  * Maximum size of content that a TCP connection can read. Must be at least 4K.
  * Default is "infinity" -- ie. no limit. This is to prevent DOS attacks
  * launched by writing to a TCP connection until the server chokes.</li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.DELIVER_TERMINATED_EVENT_FOR_NULL_DIALOG = [true|false] </b><br/>
  * If set to false (the default), the application does NOT get notified when a Dialog in the
  * NULL state is terminated. ( Dialogs in the NULL state are not associated with an actual SIP Dialog.
- * They are a programming convenience. A Dialog is in the NULL state before the first response for the 
+ * They are a programming convenience. A Dialog is in the NULL state before the first response for the
  * Dialog forming Transaction). If set to true, the SipListener will get a DialogTerminatedEvent
- * when a Dialog in the NULL state is terminated. 
+ * when a Dialog in the NULL state is terminated.
  * </li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.CACHE_SERVER_CONNECTIONS = [true|false] </b> <br/>
  * Default value is true. Setting this to false makes the Stack close the server
  * socket after a Server Transaction goes to the TERMINATED state. This allows a
@@ -231,15 +231,15 @@ import javax.sip.message.Request;
  * action), the stack will keep the socket open so as to maximize performance at
  * the expense of Thread and memory resources - leaving itself open to DOS
  * attacks.</li>
- * 
- * 
+ *
+ *
  * <li><b>gov.nist.javax.sip.CACHE_CLIENT_CONNECTIONS = [true|false] </b> <br/>
  * Default value is true. Setting this to false makes the Stack close the server
  * socket after a Client Transaction goes to the TERMINATED state. This allows a
  * client release any buffers threads and socket connections associated with a
  * client transaction after the transaction has terminated at the expense of
  * performance.</li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.THREAD_POOL_SIZE = integer </b> <br/>
  * Concurrency control for number of simultaneous active threads. If
  * unspecificed, the default is "infinity". This feature is useful if you are
@@ -256,7 +256,7 @@ import javax.sip.message.Request;
  * will use the thread pool thread from this pool to parse and manage the state
  * machine but will run the listener in its own thread.</li>
  * </ul>
- * 
+ *
  * <li><b>gov.nist.javax.sip.REENTRANT_LISTENER = true|false </b> <br/>
  * Default is false. Set to true if the listener is re-entrant. If the listener
  * is re-entrant then the stack manages a thread pool and synchronously calls
@@ -266,29 +266,29 @@ import javax.sip.message.Request;
  * has to be written with this in mind. <b> If you want good performance on a
  * multithreaded machine write your listener to be re-entrant and set this
  * property to be true </b></li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.MAX_CONNECTIONS = integer </b> <br/>
  * Max number of simultaneous TCP connections handled by stack.</li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.MAX_SERVER_TRANSACTIONS = integer </b> <br/>
  * Maximum size of server transaction table. The low water mark is 80% of the
  * high water mark. Requests are selectively dropped in the lowater mark to
  * highwater mark range. Requests are unconditionally accepted if the table is
  * smaller than the low water mark. The default highwater mark is 5000</li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.MAX_CLIENT_TRANSACTIONS = integer </b> <br/>
  * Max number of active client transactions before the caller blocks and waits
  * for the number to drop below a threshold. Default is unlimited, i.e. the
  * caller never blocks and waits for a client transaction to become available
  * (i.e. it does its own resource management in the application).</li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.PASS_INVITE_NON_2XX_ACK_TO_LISTENER = true|false
  * </b> <br/>
  * If true then the listener will see the ACK for non-2xx responses for server
  * transactions. This is not standard behavior per RFC 3261 (INVITE server
  * transaction state machine) but this is a useful flag for testing. The TCK
  * uses this flag for example.</li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.MAX_LISTENER_RESPONSE_TIME = Integer </b> <br/>
  * Max time (seconds) to wait on the transaction lock used to serialize message delivery.
  *  Default time is "infinity" - i.e. if the listener never
@@ -296,32 +296,32 @@ import javax.sip.message.Request;
  * result in a unusable thread stuck waiting for the lock to be released. A good value
  * for this property is the lifespan of the transaction or the expected blocking delay in
  * the listener.
- * 
+ *
  * <li><b>gov.nist.javax.sip.MAX_TX_LIFETIME_INVITE = Integer </b> <br/>
  * Defaults -1 : infinite. Typical can be dependent on early dialog timeout by example 3 minutes could be a good default
- * Max time (seconds) an INVITE transaction is supposed to live in the stack. 
- * This is to avoid any leaks in whatever state the transaction can be in even if the application misbehaved 
- * When the max time is reached, a timeout event will fire up to the application 
- * listener so that the application can take action and then will be removed from 
- * the stack after the typical lingering period of 8s in the stack  
- * 
+ * Max time (seconds) an INVITE transaction is supposed to live in the stack.
+ * This is to avoid any leaks in whatever state the transaction can be in even if the application misbehaved
+ * When the max time is reached, a timeout event will fire up to the application
+ * listener so that the application can take action and then will be removed from
+ * the stack after the typical lingering period of 8s in the stack
+ *
  * <li><b>gov.nist.javax.sip.MAX_TX_LIFETIME_NON_INVITE = Integer </b> <br/>
  * Defaults -1 : infinite. Typical is dependent on T1 by example 2 * T1 could be a good default
- * Max time (seconds) a non INVITE transaction is supposed to live in the stack. 
- * This is to avoid any leaks in whatever state the transaction can be in even if the application misbehaved 
- * When the max time is reached, a timeout event will fire up to the application 
- * listener so that the application can take action and then will be removed from 
- * the stack after the typical lingering period of 8s in the stack. There is a 
+ * Max time (seconds) a non INVITE transaction is supposed to live in the stack.
+ * This is to avoid any leaks in whatever state the transaction can be in even if the application misbehaved
+ * When the max time is reached, a timeout event will fire up to the application
+ * listener so that the application can take action and then will be removed from
+ * the stack after the typical lingering period of 8s in the stack. There is a
  * specific property as a non INVITE property is short live as compared to INVITE
- * and so can be collected ore eagerly to save up on memory usage 
- * 
+ * and so can be collected ore eagerly to save up on memory usage
+ *
  * <li><b>gov.nist.javax.sip.DELIVER_TERMINATED_EVENT_FOR_ACK = [true|false]</b>
  * <br/>
  * Default is <it>false</it>. ACK Server Transaction is a Pseuedo-transaction.
  * If you want termination notification on ACK transactions (so all server
  * transactions can be handled uniformly in user code during cleanup), then set
  * this flag to <it>true</it>.</li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.READ_TIMEOUT = integer </b> <br/>
  * This is relevant for incoming TCP connections to prevent starvation at the
  * server. This defines the timeout in miliseconds between successive reads
@@ -330,12 +330,12 @@ import javax.sip.message.Request;
  * of the content delivered in this interval. Default value is -1 (ie. the stack
  * is wide open to starvation attacks) and the client can be as slow as it wants
  * to be.</li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.CONNECTION_TIMEOUT = integer </b> <br/>
  * This is relevant for outgoing TCP connections to prevent long Thread blocks.
  * This defines the timeout in milliseconds the stack will wait to open
  * a TCP connection before giving up.Default value is 10000</li>
- *  * 
+ *  *
  * <li><b>gov.nist.javax.sip.NETWORK_LAYER = classpath </b> <br/>
  * This is an EXPERIMENTAL property (still under active devlopment). Defines a
  * network layer that allows a client to have control over socket allocations
@@ -344,7 +344,7 @@ import javax.sip.message.Request;
  * wrapper for the standard java.net socket layer. This functionality is still
  * under active development (may be extended to support security and other
  * features).</li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.ADDRESS_RESOLVER = classpath </b><br/>
  * The fully qualified class path for an implementation of the AddressResolver
  * interface. The AddressResolver allows you to support lookup schemes for
@@ -353,12 +353,12 @@ import javax.sip.message.Request;
  * address lookup. The default address resolver is a pass-through address
  * resolver (i.e. just returns the input string without doing a resolution). See
  * gov.nist.javax.sip.DefaultAddressResolver.</li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.AUTO_GENERATE_TIMESTAMP= [true| false] </b><br/>
  * (default is false) Automatically generate a getTimeOfDay timestamp for a
  * retransmitted request if the original request contained a timestamp. This is
  * useful for profiling.</li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.THREAD_AUDIT_INTERVAL_IN_MILLISECS = long </b> <br/>
  * Defines how often the application intends to audit the SIP Stack about the
  * health of its internal threads (the property specifies the time in
@@ -370,7 +370,7 @@ import javax.sip.message.Request;
  * are disabled by default. If this property is not specified, audits will
  * remain disabled. An example of how to use this property is in
  * src/examples/threadaudit.</li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.NIO_MAX_SOCKET_IDLE_TIME = long </b> <br/>
  * Defines the number of milliseconds a NIO TCP socket will be kept alive after the
  * last IO operation on that socket. This allows to clean up after high initial load
@@ -378,14 +378,14 @@ import javax.sip.message.Request;
  * end the SIP call. A new socket will be established when needed for any existing calls
  * by the SIP RFC spec.
  * </li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.stack.USE_DIRECT_BUFFERS = [true|false]</b> <br/>
  * Default is <it>true</it> If set to <it>false</it>, the NIO stack won't use direct buffers.
  * As Direct buffers reside outside of the heap memory, they can lead to unforeseen out of memory exceptions
  * as seen in http://java.net/jira/browse/JSIP-430. This flag allows to use non direct buffers for better memory
  * monitoring and management.
  * </li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.COMPUTE_CONTENT_LENGTH_FROM_MESSAGE_BODY =
  * [true|false] </b> <br/>
  * Default is <it>false</it> If set to <it>true</it>, when you are creating a
@@ -393,7 +393,7 @@ import javax.sip.message.Request;
  * length from the message content and ignore the provided content length
  * parameter in the Message. Otherwise, it will use the content length supplied
  * and generate a parse exception if the content is truncated.
- * 
+ *
  * <li><b>gov.nist.javax.sip.CANCEL_CLIENT_TRANSACTION_CHECKED = [true|false]
  * </b> <br/>
  * Default is <it>true</it>. This flag is added in support of load balancers or
@@ -405,7 +405,7 @@ import javax.sip.message.Request;
  * client transaction late and send it out after the INVITE server transaction
  * has been Terminated. Clearly this will result in protocol errors. Setting the
  * flag to true ( default ) enables you to avoid common protocol errors.</li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.IS_BACK_TO_BACK_USER_AGENT = [true|false] </b> <br/>
  * Default is <it>false</it> This property controls a setting on the Dialog
  * objects that the stack manages. Pure B2BUA applications should set this flag
@@ -418,42 +418,42 @@ import javax.sip.message.Request;
  * in-DIALOG transaction was a INVITE ServerTransaction then Dialog waits for
  * ACK before re-INVITE is allowed to be sent. If a dialog is not ACKed within
  * 32 seconds, then the dialog is torn down and a BYE sent to the peer.</li>
- * 
- * 
+ *
+ *
  * <li><b>gov.nist.javax.sip.RECEIVE_UDP_BUFFER_SIZE = int </b> <br/>
  * Default is <it>8*1024</it>. This property control the size of the UDP buffer
  * used for SIP messages. Under load, if the buffer capacity is overflown the
  * messages are dropped causing retransmissions, further increasing the load and
  * causing even more retransmissions. Good values to this property for servers
  * is a big number in the order of 8*8*1024.</li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.SEND_UDP_BUFFER_SIZE = int </b> <br/>
  * Default is <it>8*1024</it>. This property control the size of the UDP buffer
  * used for SIP messages. Under load, if the buffer capacity is overflown the
  * messages are dropped causing retransmissions, further increasing the load and
  * causing even more retransmissions. Good values to this property for servers
  * is a big number in the order of 8*8*1024 or higher.</li>
- * 
- * <li><b>gov.nist.javax.sip.CONGESTION_CONTROL_TIMEOUT = int </b> How 
+ *
+ * <li><b>gov.nist.javax.sip.CONGESTION_CONTROL_TIMEOUT = int </b> How
  * much time messages are allowed to wait in queue before being dropped due to
  * stack being too slow to respond. Default value is 8000 ms. The value is in
  *  milliseconds
  * </li>
- * 
- * <li><b>gov.nist.javax.sip.TCP_POST_PARSING_THREAD_POOL_SIZE = integer </b> 
+ *
+ * <li><b>gov.nist.javax.sip.TCP_POST_PARSING_THREAD_POOL_SIZE = integer </b>
  * Use 0 or do not set this option to disable it.
- * 
+ *
  * When using TCP your phones/clients usually connect independently creating their own TCP
  * sockets. Sometimes however SIP devices are allowed to tunnel multiple calls over
  * a single socket. This can also be simulated with SIPP by running "sipp  -t t1".
- *  
+ *
  * In the stack each TCP socket has it's own thread. When all calls are using the same
  * socket they all use a single thread, which leads to severe performance penalty,
  * especially on multi-core machines.
- * 
+ *
  * This option instructs the SIP stack to use a thread pool and split the CPU load
  * between many threads. The number of the threads is specified in this parameter.
- * 
+ *
  * The processing is split immediately after the parsing of the message. It cannot
  * be split before the parsing because in TCP the SIP message size is in the
  * Content-Length header of the message and the access to the TCP network stream
@@ -461,25 +461,25 @@ import javax.sip.message.Request;
  * This causes most of the parsing for all calls to occur in a single thread, which
  * may have impact on the performance in trivial applications using a single socket
  * for all calls. In most applications it doesn't have performance impact.
- * 
+ *
  * If the phones/clients use separate TCP sockets for each call this option doesn't
  * have much impact, except the slightly increased memory footprint caused by the
  * thread pool. It is recommended to disable this option in this case by setting it
  * 0 or not setting it at all. You can simulate multi-socket mode with "sipp -t t0".
- * 
+ *
  * With this option also we avoid closing the TCP socket when something fails, because
  * we must keep processing other messages for other calls.
- * 
+ *
  * Note: This option relies on accurate Content-Length headers in the SIP messages. It
  * cannot recover once a malformed message is processed, because the stream iterator
  * will not be aligned any more. Eventually the connection will be closed.
  * </li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.DELIVER_UNSOLICITED_NOTIFY = [true|false] </b> <br/>
  * Default is <it>false</it>. This flag is added to allow Sip Listeners to
  * receive all NOTIFY requests including those that are not part of a valid
  * dialog.</li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.REJECT_STRAY_RESPONSES = [true|false] </b> Default
  * is <it>false</it> A flag that checks responses to test whether the response
  * corresponds to a via header that was previously generated by us. Note that
@@ -488,44 +488,44 @@ import javax.sip.message.Request;
  * suffix to the VIA header branch and check any response arriving at the stack
  * to see if that response suffix is present. If it is not present, then the
  * stack will silently drop the response.</li>
- * 
- * <li><b>gov.nist.javax.sip.MAX_FORK_TIME_SECONDS = integer </b> Maximum time for which the original 
+ *
+ * <li><b>gov.nist.javax.sip.MAX_FORK_TIME_SECONDS = integer </b> Maximum time for which the original
  * transaction for which a forked response is received is tracked. This property
  * is only relevant to Dialog Stateful applications ( User Agents or B2BUA).
  * When a forked response is received in this time interval from when the original
  * INVITE client transaction was sent, the stack will place the original INVITE
  * client transction in the ResponseEventExt and deliver that to the application.
  * The event handler can get the original transaction from this event. </li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.EARLY_DIALOG_TIMEOUT_SECONDS=integer </b> Maximum time for which a dialog
  * can remain in early state. This is defaulted to 3 minutes ( 180 seconds).
  * </li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.THREAD_PRIORITY=integer </b> Control the priority of the threads started by the stack.
- * </li> 
- * 
+ * </li>
+ *
  * <li><b>gov.nist.javax.sip.MESSAGE_PARSER_FACTORY =  name of the class implementing gov.nist.javax.sip.parser.MessageParserFactory</b>
  * This factory allows pluggable implementations of the MessageParser that will take care of parsing the incoming messages.
  * By example one could plug a lazy parser through this factory.</li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.MESSAGE_PROCESSOR_FACTORY =  name of the class implementing gov.nist.javax.sip.parser.MessageProcessorFactory</b>
  * This factory allows pluggable implementations of the MessageProcessor that will take care of incoming messages.
  * By example one could plug a NIO Processor through this factory.</li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.TIMER_CLASS_NAME =  name of the class implementing gov.nist.javax.sip.stack.timers.SipTimer</b> interface
  * This allows pluggable implementations of the Timer that will take care of scheduling the various SIP Timers.
  * By example one could plug a regular timer, a scheduled thread pool executor.</li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.DELIVER_RETRANSMITTED_ACK_TO_LISTENER=boolean</b> A testing property
  * that allows application to see the ACK for retransmitted 200 OK requests. <b>Note that this is for test
  * purposes only</b></li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.AGGRESSIVE_CLEANUP=boolean</b> <b>Deprecated - use RELEASE_REFERENCES_STRATEGY instead</b>
  *  A property that will cleanup Dialog, and Transaction structures
  * agrressively to improve memroy usage and performance (up to 50% gain). However one needs to be careful in its code
  * on how and when it accesses transaction and dialog data since it cleans up aggressively when transactions changes state
  * to COMPLETED or TERMINATED and for Dialog once the ACK is received/sent</li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.RELEASE_REFERENCES_STRATEGY=String</b>
  * A property that specify the strategy for cleaning up references within the Dialog and Transaction structures. Following options can be used
  * <ul>
@@ -542,18 +542,18 @@ import javax.sip.message.Request;
  * <ul>
  * <li><b>gov.nist.javax.sip.LINGER_TIMER=int</b>
  *  A property that will specify for how many seconds the Dialog and Transaction structures will stay in memory before the stack releases them</li>
- * 
- * 
+ *
+ *
  * <li><b>gov.nist.javax.sip.MIN_KEEPALIVE_TIME_SECONDS = integer</b> Minimum time between keep alive
  * pings (CRLF CRLF) from clients. If pings arrive with less than this frequency they will be replied
  * with CRLF CRLF if greater they will be rejected. The default is -1 (i.e. do not respond to CRLF CRLF).
  * </li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.DIALOG_TIMEOUT_FACTOR= integer</b> Default to 64. The number of ticks before a
  * dialog that does not receive an ACK receives a Timeout notification. Note that this is only relevant
  * if the registered SipListener is of type SipListenerExt
  * </li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.SIP_MESSAGE_VALVE= String</b> Default to null. The class name of your custom valve component.
  * An instance of this class will be created and the SIPMessageValve.processRequest/Response() methods will be called for every message
  * before any long-lived SIP Stack resources are allocated (no transactions, no dialogs). From within the processRequest callback
@@ -561,10 +561,10 @@ import javax.sip.message.Request;
  * the next steps of the pipeline. Similarly from processResponse() you can manipulate a response or drop it silently, but dropping
  * responses is not recommended, because the transaction already exists when the request for the response was sent.
  * </li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.SIP_EVENT_INTERCEPTOR</b> Default to null. The class name of your custom interceptor object.
  * An instance of this object will be created at initialization of the stack. You must implement the interface
- * gov.nist.javax.sip.stack.SIPEventInterceptor and handle the lifecycle callbacks. This interface is the solution for 
+ * gov.nist.javax.sip.stack.SIPEventInterceptor and handle the lifecycle callbacks. This interface is the solution for
  * https://jain-sip.dev.java.net/issues/show_bug.cgi?id=337 . It allows to wrap the JSIP pipeline and execute custom
  *  analysis logic as SIP messages advance through the pipeline checkpoints. One example implementation of this interceptor
  *  is <b>gov.nist.javax.sip.stack.CallAnalysisInterceptor</b>, which will periodically check for requests stuck in the
@@ -573,21 +573,21 @@ import javax.sip.message.Request;
  *  production under load is only 2% peak on average laptop machine. There is minimal locking inside. One known limitation
  *  of this feature is that you must use  gov.nist.javax.sip.REENTRANT_LISTENER=true to ensure that the request will be
  *  processed in the original thread completely for UDP.</li>
- * 
+ *
  *  <li><b>gov.nist.javax.sip.TLS_CLIENT_PROTOCOLS = String </b>
  *  Comma-separated list of protocols to use when creating outgoing TLS connections.
  *  The default is "TLSv1.2, TLSv1.1, TLSv1".
- *  It's advisable not to use SSL protocols because of http://googleonlinesecurity.blogspot.fr/2014/10/this-poodle-bites-exploiting-ssl-30.html 
+ *  It's advisable not to use SSL protocols because of http://googleonlinesecurity.blogspot.fr/2014/10/this-poodle-bites-exploiting-ssl-30.html
  * </li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.TLS_SECURITY_POLICY = String </b> The fully qualified path
  * name of a TLS Security Policy implementation that is consulted for certificate verification
  * of outbund TLS connections.
  * </li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.TLS_CLIENT_AUTH_TYPE = String </b> Valid values are Default (backward compatible with previous versions)
- * , Enabled, Want, Disabled or DisabledAll. Set to Enabled if you want the SSL stack to require a valid certificate chain from the client before 
- * accepting a connection. Set to Want if you want the SSL stack to request a client Certificate, but not fail if one isn't presented. 
+ * , Enabled, Want, Disabled or DisabledAll. Set to Enabled if you want the SSL stack to require a valid certificate chain from the client before
+ * accepting a connection. Set to Want if you want the SSL stack to request a client Certificate, but not fail if one isn't presented.
  * A Disabled value will not require a certificate chain for the Server Connection. A DisabledAll will not require a certificate chain for both Server and Client Connections.
  * </li>
  *
@@ -596,11 +596,11 @@ import javax.sip.message.Request;
  *
  *  <li><b>gov.nist.javax.sip.TCP_NODELAY = [true|false]</b>
  *  Whether or not to disable Nagle's algorithm for TCP sockets. Defaults to {@code false}.</li>
- * 
+ *
  * <li><b>gov.nist.javax.sip.SSL_HANDSHAKE_TIMEOUT</b> Value in seconds which is used as default timeout for performing the SSL Handshake
  * This prevents bad clients of connecting without sending any data to block the server</li>
- * 
- * <li><b>gov.nist.javax.sip.SSL_RENEGOTIATION_ENABLED = [true|false]</b> Default value is <b>true</b>. Allow or disallow SSL renegotiation to resolve potential DoS problem - 
+ *
+ * <li><b>gov.nist.javax.sip.SSL_RENEGOTIATION_ENABLED = [true|false]</b> Default value is <b>true</b>. Allow or disallow SSL renegotiation to resolve potential DoS problem -
  * <a href="http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2011-1473">reference</a> and <a href="http://www.ietf.org/mail-archive/web/tls/current/msg07553.html">another reference</a>. The safe option is to disable it.</li>
  *
  *
@@ -630,12 +630,12 @@ import javax.sip.message.Request;
  *
  *
  * @version 1.2 $Revision: 1.143 $ $Date: 2010-12-02 22:04:18 $
- * 
+ *
  * @author M. Ranganathan <br/>
- * 
- * 
- * 
- * 
+ *
+ *
+ *
+ *
  */
 public class SipStackImpl extends SIPTransactionStack implements
 		javax.sip.SipStack, SipStackExt {
@@ -664,7 +664,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 	// RFC3261: TLS_RSA_WITH_AES_128_CBC_SHA MUST be supported
 	// RFC3261: TLS_RSA_WITH_3DES_EDE_CBC_SHA SHOULD be supported for backwards
 	// compat
-	private String[] cipherSuites = {
+        public static final String[] DEFAULT_CIPHERS = {
 			"TLS_RSA_WITH_AES_128_CBC_SHA", // AES difficult to get with
 											// c++/Windows
 			// "TLS_RSA_WITH_3DES_EDE_CBC_SHA", // Unsupported by Sun impl,
@@ -674,6 +674,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 			// ciphersuites
 			"TLS_DH_anon_WITH_AES_128_CBC_SHA",
 			"SSL_DH_anon_WITH_3DES_EDE_CBC_SHA", };
+	private String[] cipherSuites = DEFAULT_CIPHERS;
 
 	// Supported protocols for TLS client: can be overridden by application
 	private String[] enabledProtocols = {
@@ -716,9 +717,9 @@ public class SipStackImpl extends SIPTransactionStack implements
 		this.listeningPoints = new Hashtable<String, ListeningPointImpl>();
 		this.sipProviders = Collections.synchronizedList(new LinkedList<SipProviderImpl>());
 		this.sipListener = null;
-		if(!getTimer().isStarted()) {			
+		if(!getTimer().isStarted()) {
 			String defaultTimerName = configurationProperties.getProperty("gov.nist.javax.sip.TIMER_CLASS_NAME",DefaultSipTimer.class.getName());
-			try {				
+			try {
 				setTimer((SipTimer)Class.forName(defaultTimerName).newInstance());
 				getTimer().start(this, configurationProperties);
 				if (getThreadAuditor() != null && getThreadAuditor().isEnabled()) {
@@ -728,14 +729,14 @@ public class SipStackImpl extends SIPTransactionStack implements
 			} catch (Exception e) {
 				logger
 					.logError(
-							"Bad configuration value for gov.nist.javax.sip.TIMER_CLASS_NAME", e);			
+							"Bad configuration value for gov.nist.javax.sip.TIMER_CLASS_NAME", e);
 			}
 		}
 	}
 
 	/**
 	 * Return true if automatic dialog support is enabled for this stack.
-	 * 
+	 *
 	 * @return boolean, true if automatic dialog support is enabled for this
 	 *         stack
 	 */
@@ -745,7 +746,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 
 	/**
 	 * Constructor for the stack.
-	 * 
+	 *
 	 * @param configurationProperties
 	 *            -- stack configuration properties including NIST-specific
 	 *            extensions.
@@ -836,13 +837,13 @@ public class SipStackImpl extends SIPTransactionStack implements
 
 		super.setReliableConnectionKeepAliveTimeout(1000 * Integer.parseInt(
 			        configurationProperties.getProperty("gov.nist.javax.sip.RELIABLE_CONNECTION_KEEP_ALIVE_TIMEOUT", "-1")));
-		
+
 		// http://java.net/jira/browse/JSIP-415 Prevent Bad Client or Attacker (DoS) to block the TLSMessageProcessor or TLSMessageChannel
 		super.setSslHandshakeTimeout(Long.parseLong(
 		        configurationProperties.getProperty("gov.nist.javax.sip.SSL_HANDSHAKE_TIMEOUT", "-1")));
 		super.setThreadPriority(Integer.parseInt(
 			        configurationProperties.getProperty("gov.nist.javax.sip.THREAD_PRIORITY","" + Thread.MAX_PRIORITY)));
-			
+
 		// Default router -- use this for routing SIP URIs.
 		// Our router does not do DNS lookups.
 		this.outboundProxy = configurationProperties
@@ -918,14 +919,14 @@ public class SipStackImpl extends SIPTransactionStack implements
 					this.addExtensionMethod(em);
 			}
 		}
-		
+
 		// Allow application to choose the tls client auth policy on the socket
         String clientAuthType = configurationProperties.getProperty("gov.nist.javax.sip.TLS_CLIENT_AUTH_TYPE");
         if (clientAuthType != null) {
             super.clientAuth = ClientAuthType.valueOf(clientAuthType);
             logger.logInfo("using " + clientAuthType + " tls auth policy");
         }
-		
+
 		String keyStoreFile = configurationProperties
 				.getProperty("javax.net.ssl.keyStore");
 		String trustStoreFile = configurationProperties
@@ -943,9 +944,9 @@ public class SipStackImpl extends SIPTransactionStack implements
 					.getProperty("javax.net.ssl.keyStoreType");
 			String trustStoreType = configurationProperties
 					.getProperty("javax.net.ssl.trustStoreType");
-			
+
 			if(trustStoreType == null) trustStoreType = keyStoreType;
-			
+
 			try {
 				this.networkLayer = new SslNetworkLayer(this, trustStoreFile,
 						keyStoreFile,
@@ -999,7 +1000,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 		} else {
 			super.maxTxLifetimeInvite = -1;
 		}
-		
+
     	// http://java.net/jira/browse/JSIP-420
 		if (configurationProperties
 				.getProperty("gov.nist.javax.sip.MAX_TX_LIFETIME_NON_INVITE") != null) {
@@ -1012,7 +1013,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 		} else {
 			super.maxTxLifetimeNonInvite = -1;
 		}
-		 
+
 
 		this.setDeliverTerminatedEventForAck(configurationProperties
 				.getProperty(
@@ -1021,7 +1022,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 
 		super.setDeliverUnsolicitedNotify(Boolean.parseBoolean( configurationProperties.getProperty(
 				"gov.nist.javax.sip.DELIVER_UNSOLICITED_NOTIFY", "false")));
-				
+
 
 		String forkedSubscriptions = configurationProperties
 				.getProperty("javax.sip.FORKABLE_EVENTS");
@@ -1054,7 +1055,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 					+ "- check that it is present on the classpath and that there is a no-args constructor defined",
 					ex);
 		}
-		
+
 		// The following features are unique to the NIST implementation.
 
 		/*
@@ -1248,7 +1249,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 					logger.logError("Bad read timeout " + readTimeout);
 			}
 		}
-                
+
 		String connTimeout = configurationProperties
 				.getProperty("gov.nist.javax.sip.CONNECTION_TIMEOUT");
 		if (connTimeout != null) {
@@ -1265,7 +1266,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 				if (logger.isLoggingEnabled())
 					logger.logError("Bad conn timeout " + readTimeout);
 			}
-		}                
+		}
 
 		// Get the address of the stun server.
 
@@ -1362,10 +1363,10 @@ public class SipStackImpl extends SIPTransactionStack implements
 		if (tlsClientProtocols != null)
 		{
 			// http://java.net/jira/browse/JSIP-451 - josemrecio
-			// accepts protocol list enclosed in "" and separated by spaces and/or commas 
+			// accepts protocol list enclosed in "" and separated by spaces and/or commas
 			StringTokenizer st = new StringTokenizer(tlsClientProtocols, "\" ,");
 			String[] protocols = new String[st.countTokens()];
-			
+
 			if (logger.isLoggingEnabled(LogLevels.TRACE_DEBUG))
 	            logger.logDebug(
 	                "TLS Client Protocols = ");
@@ -1387,10 +1388,10 @@ public class SipStackImpl extends SIPTransactionStack implements
 
 		super.setPatchWebSocketHeaders(Boolean.parseBoolean(configurationProperties.getProperty(
 				"gov.nist.javax.sip.PATCH_SIP_WEBSOCKETS_HEADERS", "true")));
-		
+
 		super.setPatchRport(Boolean.parseBoolean(configurationProperties.getProperty(
 				"gov.nist.javax.sip.ALWAYS_ADD_RPORT", "false")));
-		
+
 		super.cancelClientTransactionChecked = configurationProperties
 				.getProperty(
 						"gov.nist.javax.sip.CANCEL_CLIENT_TRANSACTION_CHECKED",
@@ -1439,51 +1440,51 @@ public class SipStackImpl extends SIPTransactionStack implements
 		super.checkBranchId = Boolean.parseBoolean(configurationProperties
 				.getProperty("gov.nist.javax.sip.REJECT_STRAY_RESPONSES",
 						Boolean.FALSE.toString()));
-		
+
 		super.isDialogTerminatedEventDeliveredForNullDialog = (Boolean.parseBoolean(configurationProperties.getProperty("gov.nist.javax.sip.DELIVER_TERMINATED_EVENT_FOR_NULL_DIALOG",
 		        Boolean.FALSE.toString())));
-		
-		
+
+
 		super.maxForkTime = Integer.parseInt(
 		        configurationProperties.getProperty("gov.nist.javax.sip.MAX_FORK_TIME_SECONDS","0"));
-		
+
 		super.earlyDialogTimeout = Integer.parseInt(
-                configurationProperties.getProperty("gov.nist.javax.sip.EARLY_DIALOG_TIMEOUT_SECONDS","180"));				
-		
+                configurationProperties.getProperty("gov.nist.javax.sip.EARLY_DIALOG_TIMEOUT_SECONDS","180"));
+
 		super.minKeepAliveInterval = Integer.parseInt(configurationProperties.getProperty("gov.nist.javax.sip.MIN_KEEPALIVE_TIME_SECONDS","-1"));
-		
+
 		super.deliverRetransmittedAckToListener = Boolean.parseBoolean(configurationProperties.getProperty
 				("gov.nist.javax.sip.DELIVER_RETRANSMITTED_ACK_TO_LISTENER","false"));
-		
+
 		super.dialogTimeoutFactor = Integer.parseInt(configurationProperties.getProperty("gov.nist.javax.sip.DIALOG_TIMEOUT_FACTOR","64"));
-		
+
 		String messageParserFactoryName = configurationProperties.getProperty("gov.nist.javax.sip.MESSAGE_PARSER_FACTORY",StringMsgParserFactory.class.getName());
 		try {
 			super.messageParserFactory = (MessageParserFactory) Class.forName(messageParserFactoryName).newInstance();
 		} catch (Exception e) {
 			logger
 				.logError(
-						"Bad configuration value for gov.nist.javax.sip.MESSAGE_PARSER_FACTORY", e);			
+						"Bad configuration value for gov.nist.javax.sip.MESSAGE_PARSER_FACTORY", e);
 		}
-		
+
 		String messageProcessorFactoryName = configurationProperties.getProperty("gov.nist.javax.sip.MESSAGE_PROCESSOR_FACTORY",OIOMessageProcessorFactory.class.getName());
 		try {
 			super.messageProcessorFactory = (MessageProcessorFactory) Class.forName(messageProcessorFactoryName).newInstance();
 		} catch (Exception e) {
 			logger
 				.logError(
-						"Bad configuration value for gov.nist.javax.sip.MESSAGE_PROCESSOR_FACTORY", e);			
+						"Bad configuration value for gov.nist.javax.sip.MESSAGE_PROCESSOR_FACTORY", e);
 		}
-		
+
 		String maxIdleTimeString = configurationProperties.getProperty("gov.nist.javax.sip.NIO_MAX_SOCKET_IDLE_TIME", "7200000");
 		try {
 			super.nioSocketMaxIdleTime = Long.parseLong(maxIdleTimeString);
 		} catch (Exception e) {
 			logger
 				.logError(
-						"Bad configuration value for gov.nist.javax.sip.NIO_MAX_SOCKET_IDLE_TIME=" + maxIdleTimeString, e);			
+						"Bad configuration value for gov.nist.javax.sip.NIO_MAX_SOCKET_IDLE_TIME=" + maxIdleTimeString, e);
 		}
-		
+
 		String defaultTimerName = configurationProperties.getProperty("gov.nist.javax.sip.TIMER_CLASS_NAME",DefaultSipTimer.class.getName());
 		try {
 			setTimer((SipTimer)Class.forName(defaultTimerName).newInstance());
@@ -1495,7 +1496,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 		} catch (Exception e) {
 			logger
 				.logError(
-						"Bad configuration value for gov.nist.javax.sip.TIMER_CLASS_NAME", e);			
+						"Bad configuration value for gov.nist.javax.sip.TIMER_CLASS_NAME", e);
 		}
 		boolean aggressiveCleanup = Boolean.parseBoolean(configurationProperties
 				.getProperty("gov.nist.javax.sip.AGGRESSIVE_CLEANUP",
@@ -1503,7 +1504,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 		if(aggressiveCleanup) {
 			setReleaseReferencesStrategy(ReleaseReferencesStrategy.Normal);
 		}
-		
+
 		 String releaseReferencesStrategyString = configurationProperties
 				.getProperty("gov.nist.javax.sip.RELEASE_REFERENCES_STRATEGY");
 		 if(releaseReferencesStrategyString != null) {
@@ -1511,7 +1512,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 			 if (logger.isLoggingEnabled(LogLevels.TRACE_DEBUG))
 					logger.logDebug("Using following release references strategy " + getReleaseReferencesStrategy());
 		 }
-		
+
 		String valveClassName = configurationProperties.getProperty("gov.nist.javax.sip.SIP_MESSAGE_VALVE", null);
 		if(valveClassName != null && !valveClassName.equals("")) {
 			try {
@@ -1529,7 +1530,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 			} catch (Exception e) {
 				logger
 				.logError(
-						"Bad configuration value for gov.nist.javax.sip.SIP_MESSAGE_VALVE", e);			
+						"Bad configuration value for gov.nist.javax.sip.SIP_MESSAGE_VALVE", e);
 			}
 		}
 
@@ -1547,27 +1548,27 @@ public class SipStackImpl extends SIPTransactionStack implements
 							logger
 							.logError("Error intializing SIPEventInterceptor", e);
 						}
-						
+
 					}
 				}.start();
 			} catch (Exception e) {
 				logger
 					.logError(
-							"Bad configuration value for gov.nist.javax.sip.SIP_EVENT_INTERCEPTOR", e);			
+							"Bad configuration value for gov.nist.javax.sip.SIP_EVENT_INTERCEPTOR", e);
 			}
 		}
-		
+
 		boolean sslRenegotiationEnabled = Boolean.parseBoolean(configurationProperties.getProperty(
 				"gov.nist.javax.sip.SSL_RENEGOTIATION_ENABLED",
 				"true"));
-		
+
 		setSslRenegotiationEnabled(sslRenegotiationEnabled);
-		
+
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see javax.sip.SipStack#createListeningPoint(java.lang.String, int,
 	 * java.lang.String)
 	 */
@@ -1642,7 +1643,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see javax.sip.SipStack#createSipProvider(javax.sip.ListeningPoint)
 	 */
 	public SipProvider createSipProvider(ListeningPoint listeningPoint)
@@ -1666,7 +1667,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see javax.sip.SipStack#deleteListeningPoint(javax.sip.ListeningPoint)
 	 */
 	public void deleteListeningPoint(ListeningPoint listeningPoint)
@@ -1683,7 +1684,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see javax.sip.SipStack#deleteSipProvider(javax.sip.SipProvider)
 	 */
 	public void deleteSipProvider(SipProvider sipProvider)
@@ -1714,7 +1715,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 
 	/**
 	 * Get the IP Address of the stack.
-	 * 
+	 *
 	 * @see javax.sip.SipStack#getIPAddress()
 	 * @deprecated
 	 */
@@ -1724,7 +1725,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see javax.sip.SipStack#getListeningPoints()
 	 */
 	public java.util.Iterator getListeningPoints() {
@@ -1733,7 +1734,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 
 	/**
 	 * Return true if retransmission filter is active.
-	 * 
+	 *
 	 * @see javax.sip.SipStack#isRetransmissionFilterActive()
 	 * @deprecated
 	 */
@@ -1743,7 +1744,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see javax.sip.SipStack#getSipProviders()
 	 */
 	public java.util.Iterator<SipProviderImpl> getSipProviders() {
@@ -1752,7 +1753,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see javax.sip.SipStack#getStackName()
 	 */
 	public String getStackName() {
@@ -1762,7 +1763,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 	/**
 	 * Finalization -- stop the stack on finalization. Exit the transaction
 	 * scanner and release all resources.
-	 * 
+	 *
 	 * @see java.lang.Object#finalize()
 	 */
 	protected void finalize() {
@@ -1771,7 +1772,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 
 	/**
 	 * This uses the default stack address to create a listening point.
-	 * 
+	 *
 	 * @see javax.sip.SipStack#createListeningPoint(java.lang.String, int,
 	 *      java.lang.String)
 	 * @deprecated
@@ -1786,7 +1787,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see javax.sip.SipStack#stop()
 	 */
 	public void stop() {
@@ -1795,9 +1796,9 @@ public class SipStackImpl extends SIPTransactionStack implements
 			logger.logStackTrace();
 		}
 		this.stopStack();
-		if(super.sipMessageValve != null) 
+		if(super.sipMessageValve != null)
 			super.sipMessageValve.destroy();
-		if(super.sipEventInterceptor != null) 
+		if(super.sipEventInterceptor != null)
 			super.sipEventInterceptor.destroy();
 		this.sipProviders = Collections.synchronizedList(new LinkedList<SipProviderImpl>());
 		this.listeningPoints = new Hashtable<String, ListeningPointImpl>();
@@ -1814,7 +1815,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see javax.sip.SipStack#start()
 	 */
 	public void start() throws ProviderDoesNotExistException, SipException {
@@ -1829,9 +1830,9 @@ public class SipStackImpl extends SIPTransactionStack implements
 	 * Get the listener for the stack. A stack can have only one listener. To
 	 * get an event from a provider, the listener has to be registered with the
 	 * provider. The SipListener is application code.
-	 * 
+	 *
 	 * @return -- the stack SipListener
-	 * 
+	 *
 	 */
 	public SipListener getSipListener() {
 		return this.sipListener;
@@ -1849,7 +1850,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 
 	/**
 	 * Get the message log factory registered with the stack.
-	 * 
+	 *
 	 * @return -- the messageLogFactory of the stack.
 	 */
 	public LogRecordFactory getLogRecordFactory() {
@@ -1860,7 +1861,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 	 * Set the log appender ( this is useful if you want to specify a particular
 	 * log format or log to something other than a file for example). This method
 	 * is will be removed May 11, 2010 or shortly there after.
-	 * 
+	 *
 	 * @param Appender
 	 *            - the log4j appender to add.
 	 * @deprecated TODO: remove this method May 11, 2010.
@@ -1875,7 +1876,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 	/**
 	 * Get the log4j logger ( for log stream integration ).
 	 * This method will be removed May 11, 2010 or shortly there after.
-	 * 
+	 *
 	 * @return  the log4j logger.
 	 * @deprecated TODO: This method will be removed May 11, 2010.
 	 */
@@ -1893,7 +1894,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * gov.nist.javax.sip.SipStackExt#getAuthenticationHelper(gov.nist.javax
 	 * .sip.clientauthutils.AccountManager, javax.sip.header.HeaderFactory)
@@ -1905,7 +1906,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * gov.nist.javax.sip.SipStackExt#getAuthenticationHelper(gov.nist.javax
 	 * .sip.clientauthutils.AccountManager, javax.sip.header.HeaderFactory)
@@ -1927,13 +1928,13 @@ public class SipStackImpl extends SIPTransactionStack implements
 	 * <li>TLS_DH_anon_WITH_AES_128_CBC_SHA</li>
 	 * <li>SSL_DH_anon_WITH_3DES_EDE_CBC_SHA</li>
 	 * </ul>
-	 * 
+	 *
 	 * <b>NOTE: This function must be called before adding a TLS listener</b>
-	 * 
+	 *
 	 * @param String
 	 *            [] The new set of ciphers to support.
 	 * @return
-	 * 
+	 *
 	 */
 	public void setEnabledCipherSuites(String[] newCipherSuites) {
 		cipherSuites = newCipherSuites;
@@ -1941,7 +1942,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 
 	/**
 	 * Return the currently enabled cipher suites of the Stack.
-	 * 
+	 *
 	 * @return The currently enabled cipher suites.
 	 */
 	public String[] getEnabledCipherSuites() {
@@ -1960,13 +1961,13 @@ public class SipStackImpl extends SIPTransactionStack implements
 	 * <li>TLSv1.1</li>
 	 * <li>TLSv1</li>
 	 * </ul>
-	 * 
+	 *
 	 * <b>NOTE: This function must be called before creating a TLSMessageChannel.</b>
-	 * 
+	 *
 	 * @param String
 	 *            [] The new set of protocols to use for outgoing TLS connections.
 	 * @return
-	 * 
+	 *
 	 */
 	public void setEnabledProtocols(String[] newProtocols) {
 		enabledProtocols = newProtocols;
@@ -1974,7 +1975,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 
 	/**
 	 * Return the currently enabled protocols to use when creating TLS connection.
-	 * 
+	 *
 	 * @return The currently enabled protocols.
 	 */
 	public String[] getEnabledProtocols() {
@@ -1983,20 +1984,20 @@ public class SipStackImpl extends SIPTransactionStack implements
 
 	/**
 	 * Set the "back to back User Agent" flag.
-	 * 
+	 *
 	 * @param flag
 	 *            - boolean flag to set.
-	 * 
+	 *
 	 */
 	public void setIsBackToBackUserAgent(boolean flag) {
 		super.isBackToBackUserAgent = flag;
 	}
-	
+
 	/**
 	 * Get the "back to back User Agent" flag.
-	 * 
+	 *
 	 * return the value of the flag
-	 * 
+	 *
 	 */
 	public boolean isBackToBackUserAgent() {
 		return super.isBackToBackUserAgent;
@@ -2022,7 +2023,7 @@ public class SipStackImpl extends SIPTransactionStack implements
             return false;
         }
     }
-    
+
     public void releaseSem() {
         this.stackSemaphore.release();
     }
@@ -2033,7 +2034,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 	public Properties getConfigurationProperties() {
 		return configurationProperties;
 	}
-	
+
 	/**
 	 * @return the reEntrantListener
 	 */
@@ -2042,6 +2043,6 @@ public class SipStackImpl extends SIPTransactionStack implements
 	}
 
 
-    
+
 
 }
