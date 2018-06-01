@@ -207,6 +207,8 @@ public class ListMap {
         headerListTable.put(SecurityVerify.class, SecurityVerifyList.class);
 
         headerListTable.put(PAssertedIdentity.class, PAssertedIdentityList.class);
+
+        headerListTable.put(PAccessNetworkInfo.class, PAccessNetworkInfoList.class);
         
         // https://java.net/jira/browse/JSIP-460
         headerListTable.put(Reason.class, ReasonList.class);
