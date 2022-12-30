@@ -692,7 +692,7 @@ public abstract class ConnectionOrientedMessageChannel extends MessageChannel im
     
 	/*
      * (non-Javadoc)
-     * @see gov.nist.javax.sip.parser.SIPMessageListener#sendSingleCLRF()
+     * @see gov.nist.javax.sip.parser.SIPMessageListener#sendSingleCRLF()
      */
 	public void sendSingleCRLF() throws Exception {
         lastKeepAliveReceivedTime = System.currentTimeMillis();
