@@ -443,7 +443,7 @@ public class LexerCore extends StringTokenizer {
             while (hasMoreChars()) {
                 char nextChar = lookAhead(0);
                 if ( nextChar == ' ' || nextChar == '\n' || nextChar == '\t' ) {
-			break;
+                    break;
                 } else {
                      consume(1);
                 }
