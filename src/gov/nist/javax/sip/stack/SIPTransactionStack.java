@@ -339,7 +339,7 @@ public abstract class SIPTransactionStack implements
     // Send UDP buffer size
     protected int sendUdpBufferSize;
 
-    protected int stackCongenstionControlTimeout = 0;
+    protected int stackCongestionControlTimeout = 0;
 
     protected boolean isBackToBackUserAgent = false;
 

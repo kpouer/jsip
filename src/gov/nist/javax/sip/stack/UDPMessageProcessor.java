@@ -132,9 +132,9 @@ public class UDPMessageProcessor extends MessageProcessor implements Runnable {
             logger.logDebug("Max Message size is " + maxMessageSize);
         }
         this.messageQueue = new LinkedBlockingQueue<DatagramQueuedMessageDispatch>();
-        if(sipStack.stackCongenstionControlTimeout>0) {
+        if(sipStack.stackCongestionControlTimeout >0) {
         	this.congestionAuditor = new BlockingQueueDispatchAuditor(this.messageQueue);
-        	this.congestionAuditor.setTimeout(sipStack.stackCongenstionControlTimeout);
+        	this.congestionAuditor.setTimeout(sipStack.stackCongestionControlTimeout);
         	this.congestionAuditor.start(2000);
         }
 
@@ -314,7 +314,7 @@ public class UDPMessageProcessor extends MessageProcessor implements Runnable {
     	for (Object messageChannel : messageChannels) {
     		((MessageChannel)messageChannel).close();
     	}
-    	if(sipStack.stackCongenstionControlTimeout > 0 && congestionAuditor != null) {
+    	if(sipStack.stackCongestionControlTimeout > 0 && congestionAuditor != null) {
     		this.congestionAuditor.stop();
     	}
     }

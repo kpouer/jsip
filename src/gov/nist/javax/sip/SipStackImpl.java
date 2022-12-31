@@ -1090,7 +1090,7 @@ public class SipStackImpl extends SIPTransactionStack implements
 		.parseInt(configurationProperties.getProperty(
 				"gov.nist.javax.sip.CONGESTION_CONTROL_TIMEOUT",
 		"8000"));
-		super.stackCongenstionControlTimeout = congetstionControlTimeout;
+		super.stackCongestionControlTimeout = congetstionControlTimeout;
 
 		String tcpTreadPoolSize = configurationProperties
 		.getProperty("gov.nist.javax.sip.TCP_POST_PARSING_THREAD_POOL_SIZE");
