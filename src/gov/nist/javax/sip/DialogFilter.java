@@ -1247,7 +1247,7 @@ class DialogFilter implements ServerRequestInterface, ServerResponseInterface {
                     }
                 } else {
                     // The subscription default dialog is our dialog.
-                    // Found a subscrbe dialog for the NOTIFY
+                    // Found a subscribe dialog for the NOTIFY
                     // So map the tx.
                     transaction.setDialog(subscriptionDialog, dialogId);
                     dialog = subscriptionDialog;
