@@ -319,7 +319,7 @@ public abstract class SIPTransactionStack implements
 
     // / Provides a mechanism for applications to check the health of threads in
     // the stack
-    protected ThreadAuditor threadAuditor = new ThreadAuditor();
+    protected ThreadAuditor threadAuditor;
 
     protected LogRecordFactory logRecordFactory;
 
