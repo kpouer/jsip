@@ -389,9 +389,7 @@ public class UDPMessageChannel extends MessageChannel implements
             // myParser = null; // let go of the parser reference.
             if (logger.isLoggingEnabled(LogWriter.TRACE_DEBUG)) {
                 this.logger.logDebug(
-                        "Rejecting message !  " + new String(msgBytes));
-                this.logger.logDebug(
-                        "error message " + ex.getMessage());
+                        "Rejecting message !  " + new String(msgBytes) + " " + ex.getMessage());
                 this.logger.logException(ex);
             }
 
@@ -659,8 +657,8 @@ public class UDPMessageChannel extends MessageChannel implements
     public void handleException(ParseException ex, SIPMessage sipMessage,
             Class hdrClass, String header, String message)
             throws ParseException {
-        if (logger.isLoggingEnabled(LogWriter.TRACE_DEBUG))
-            logger.logDebug("Parsing Exception: " , ex);
+        if (logger.isLoggingEnabled())
+            this.logger.logException(ex);
         // Log the bad message for later reference.
         if ((hdrClass != null)
                 && (hdrClass.equals(From.class) || hdrClass.equals(To.class)
@@ -670,10 +668,10 @@ public class UDPMessageChannel extends MessageChannel implements
                         || hdrClass.equals(ContentLength.class)
                         || hdrClass.equals(RequestLine.class) || hdrClass
                         .equals(StatusLine.class))) {
-            if (logger.isLoggingEnabled(LogWriter.TRACE_DEBUG)) {
-                logger.logDebug("BAD MESSAGE! " + message);
+            if (logger.isLoggingEnabled()) {
+                logger.logError("BAD MESSAGE!");
+                logger.logError(message);
             }
-            
             throw ex;
         } else {
             sipMessage.addUnparsed(header);

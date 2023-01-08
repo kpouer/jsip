@@ -91,7 +91,7 @@ import javax.sip.message.Request;
 
 /**
  * Implementation of SipStack.
- * 
+ *
  * The JAIN-SIP stack is initialized by a set of properties (see the JAIN SIP
  * documentation for an explanation of these properties
  * {@link javax.sip.SipStack} ).
@@ -1963,7 +1963,11 @@ public class SipStackImpl extends SIPTransactionStack implements
 		return super.isAutomaticDialogErrorHandlingEnabled;
 	}
 
-	
+	public boolean isServerLoopDetectionEnabled() {
+    return super.isServerLoopDetectionEnabled;
+  }
+
+
 	public void setTlsSecurityPolicy(TlsSecurityPolicy tlsSecurityPolicy) {
 		this.tlsSecurityPolicy = tlsSecurityPolicy;
 	}
