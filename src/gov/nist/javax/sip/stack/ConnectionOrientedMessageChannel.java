@@ -299,7 +299,6 @@ public abstract class ConnectionOrientedMessageChannel extends MessageChannel im
             sipMessage.setRemotePort(this.getPeerPort());
             sipMessage.setLocalAddress(this.getMessageProcessor().getIpAddress());
             sipMessage.setLocalPort(this.getPort());
-            //Issue 3: https://telestax.atlassian.net/browse/JSIP-3
             sipMessage.setPeerPacketSourceAddress(this.peerAddress);
             sipMessage.setPeerPacketSourcePort(this.peerPort);
             
