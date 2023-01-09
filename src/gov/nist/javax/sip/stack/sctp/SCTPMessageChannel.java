@@ -339,7 +339,7 @@ final class SCTPMessageChannel extends MessageChannel
                 // Normal processing of message.
             } else {
                 if (logger.isLoggingEnabled(LogWriter.TRACE_DEBUG)) {
-                    logger.logDebug("null sipServerResponse!");
+                    logger.logDebug("null sipServerResponse as could not acquire semaphore or the valve dropped the message.");
                 }
             }
 
@@ -369,8 +369,8 @@ final class SCTPMessageChannel extends MessageChannel
                         || hdrClass.equals(CallID.class)
                         || hdrClass.equals(RequestLine.class) || hdrClass
                         .equals(StatusLine.class))) {
-        	if (logger.isLoggingEnabled(LogWriter.TRACE_DEBUG))
-        		logger.logError("BAD MESSAGE!" + message);
+            logger.logError("BAD MESSAGE!");
+            logger.logError(message);
         	
         	// JvB: send a 400 response for requests (except ACK)
 			// Currently only UDP, @todo also other transports
