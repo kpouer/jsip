@@ -339,16 +339,22 @@ public class SipProviderImpl implements javax.sip.SipProvider, gov.nist.javax.si
         
       }
       if (logger.isLoggingEnabled(LogLevels.TRACE_DEBUG))
-        logger.logDebug(
-                        "could not find existing transaction for "
-                          + sipRequest.getFirstLine()
-                          + " creating a new one ");
+        logger.logDebug("could not find existing transaction for " + sipRequest + " creating a new one ");
       
       // Could not find a dialog or the route is not set in dialog.
       
       String transport = hop.getTransport();
       ListeningPointImpl listeningPoint = (ListeningPointImpl) this
         .getListeningPoint(transport);
+      if (logger.isLoggingEnabled(LogLevels.TRACE_DEBUG))
+        logger.logDebug("Got following Listening point " + listeningPoint + " for transport " + transport);
+      if(listeningPoint == null) {
+    	listeningPoint = (ListeningPointImpl) getListeningPoint(sipRequest.getTopmostVia().getTransport());
+    	if (logger.isLoggingEnabled(LogLevels.TRACE_DEBUG))
+          logger.logDebug("Listening point was null using new one from Via header " + listeningPoint
+                  + " for transport " + sipRequest.getTopmostVia().getTransport());
+      }
+      
       
       String dialogId = sipRequest.getDialogId(false);
       SIPDialog dialog = sipStack.getDialog(dialogId);
